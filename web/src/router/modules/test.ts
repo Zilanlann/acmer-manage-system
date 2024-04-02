@@ -10,7 +10,7 @@ export default {
   children: [
     {
       path: "/test/index",
-      name: "test",
+      name: "Test",
       component: () => import("@/views/test.vue"),
       meta: {
         title: "测试页面"
