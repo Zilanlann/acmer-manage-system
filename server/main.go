@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
 	"github.com/zilanlann/acmer-manage-system/server/routers"
 	_ "go.uber.org/automaxprocs"
@@ -17,9 +18,11 @@ import (
 
 func init() {
 	setting.Setup()
+	model.Setup()
 }
 
 func main() {
+	defer model.CloseDB()
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()

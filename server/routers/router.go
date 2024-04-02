@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/zilanlann/acmer-manage-system/server/routers/api"
 )
 
 func InitRouter() *gin.Engine {
@@ -12,6 +13,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	r.POST("/login", api.Login)
+	r.POST("/register", api.Register)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// apiv1 := r.Group("/api/v1")

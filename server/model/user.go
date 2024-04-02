@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"github.com/jinzhu/gorm"
@@ -13,7 +13,7 @@ type User struct {
 	Desc     string `gorm:"type:text"`
 	Password string `gorm:"size:255;not null"`
 	// HomePath string `gorm:"size:255"`
-	Role string `gorm:"type:enum('Super Admin', 'Teacher', 'Student');not null"`
+	Role string `gorm:"type:enum('Super Admin', 'Teacher', 'ACMer');not null"`
 }
 
 // AddUser adds a new user to the database with the given username and password.
@@ -26,7 +26,7 @@ type User struct {
 // - error: an error if there was a problem adding the user to the database.
 func AddUser(username, password string) error {
 	hash := utils.BcryptHash(password)
-	return db.Create(&User{Username: username, Password: hash}).Error
+	return db.Create(&User{Username: username, Password: hash, Role: "ACMer"}).Error
 }
 
 func CheckUser(username, password string) (int, error) {
@@ -34,7 +34,7 @@ func CheckUser(username, password string) (int, error) {
 		return 0, nil
 	}
 	var user User
-	err := db.Select(user.ID, user.Password).Where("username = ?", username).First(&user).Error
+	err := db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return 0, nil // 用户存在，密码错误

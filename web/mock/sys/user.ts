@@ -46,27 +46,27 @@ const fakeCodeList: any = {
 export default [
   // mock user login
   {
-    url: '/basic-api/login',
-    timeout: 200,
-    method: 'post',
-    response: ({ body }) => {
-      const { username, password } = body
-      const checkUser = createFakeUserList().find(
-        (item) => item.username === username && password === item.password,
-      )
-      if (!checkUser) {
-        return resultError('Incorrect account or password！')
-      }
-      const { userId, username: _username, token, realName, desc, roles } = checkUser
-      return resultSuccess({
-        roles,
-        userId,
-        username: _username,
-        token,
-        realName,
-        desc,
-      })
-    },
+    // url: '/basic-api/login',
+    // timeout: 200,
+    // method: 'post',
+    // response: ({ body }) => {
+    //   const { username, password } = body
+    //   const checkUser = createFakeUserList().find(
+    //     (item) => item.username === username && password === item.password,
+    //   )
+    //   if (!checkUser) {
+    //     return resultError('Incorrect account or password！')
+    //   }
+    //   const { userId, username: _username, token, realName, desc, roles } = checkUser
+    //   return resultSuccess({
+    //     roles,
+    //     userId,
+    //     username: _username,
+    //     token,
+    //     realName,
+    //     desc,
+    //   })
+    // },
   },
   {
     url: '/basic-api/getUserInfo',

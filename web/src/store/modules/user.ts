@@ -97,6 +97,7 @@ export const useUserStore = defineStore({
         this.setToken(token)
         return this.afterLoginAction(goHome)
       } catch (error) {
+        console.error(error)
         return Promise.reject(error)
       }
     },
