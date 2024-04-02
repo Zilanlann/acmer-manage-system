@@ -13,8 +13,8 @@ import (
 )
 
 type auth struct {
-	Username string `valid:"Required; MaxSize(50)" json:"username"`
-	Password string `valid:"Required; MaxSize(50)" json:"password"`
+	Username string `valid:"Required; MaxSize(50)" json:"username" form:"username"`
+	Password string `valid:"Required; MaxSize(50)" json:"password" form:"password"`
 }
 
 // @Summary Login
@@ -30,7 +30,6 @@ func Login(c *gin.Context) {
 	var a auth
 	if err := c.ShouldBindJSON(&a); err != nil {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-		fmt.Println("没有绑定成功")
 		return
 	}
 	ok, _ := valid.Valid(&a)
