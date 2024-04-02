@@ -47,8 +47,9 @@ var DatabaseSetting = &Database{}
 
 // Setup initialize the configuration instance
 func Setup() {
-	viper.SetConfigFile("config.toml")
-	viper.AddConfigPath("/Users/hanyifan/Developer/acmer-manage-system/server/conf")
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath("conf")
 	if err := viper.ReadInConfig(); err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
