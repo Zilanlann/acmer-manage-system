@@ -1,13 +1,18 @@
 {
   "recommendations": [
-    "vue.volar",
-    "dbaeumer.vscode-eslint",
+    "christian-kohler.path-intellisense",
+    "vscode-icons-team.vscode-icons",
+    "davidanson.vscode-markdownlint",
+    "ms-azuretools.vscode-docker",
     "stylelint.vscode-stylelint",
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "mrmlnc.vscode-less",
-    "lokalise.i18n-ally",
-    "antfu.iconify",
+    "redhat.vscode-yaml",
+    "csstools.postcss",
     "mikestead.dotenv",
-    "heybourn.headwind"
+    "eamodio.gitlens",
+    "antfu.iconify",
+    "Vue.volar"
   ]
 }

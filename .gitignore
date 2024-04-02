@@ -1,34 +1,37 @@
-node_modules
-.DS_Store
-dist
-.npmrc
-.cache
 
+!/.gitignore
+!/pnpm-lock.yaml
+# .vscode
+# Editor directories and files
+# Log files
+# apps/admin/mock/
+# local env files
+*-dist
+*.njsproj
+*.ntvs*
+*.sln
+*.suo
+*.sw?
+.DS_Store
+.cache
+.env.*.local
+.env.local
+.eslintcache
+.history
+.idea
+.local
+.npmrc
+.pnpm-debug.log*
+.turbo
+.vscode
+demo-web
+dist
+node_modules
+npm-debug.log*
+package-lock.json
+pnpm-debug.log*
+pnpm-lock.yaml
 tests/server/static
 tests/server/static/upload
-
-.local
-# local env files
-.env.local
-.env.*.local
-.eslintcache
-
-# Log files
-npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-
-# Editor directories and files
-.idea
-# .vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-package-lock.json
-pnpm-lock.yaml
-
-demo-web
