@@ -8,20 +8,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-type App struct {
-	JwtSecret string
-	PageSize  int
-	PrefixUrl string
+// type App struct {
+// 	JwtSecret string
+// 	PageSize  int
+// 	PrefixUrl string
 
-	RuntimeRootPath string
+// 	RuntimeRootPath string
 
-	LogSavePath string
-	LogSaveName string
-	LogFileExt  string
-	TimeFormat  string
-}
+// 	LogSavePath string
+// 	LogSaveName string
+// 	LogFileExt  string
+// 	TimeFormat  string
+// }
 
-var AppSetting = &App{}
+// var AppSetting = &App{}
 
 type Server struct {
 	RunMode      string
@@ -44,6 +44,15 @@ type Database struct {
 }
 
 var DatabaseSetting = &Database{}
+
+type Jwt struct {
+	Secret           []byte
+	LongExpiresTime  time.Duration
+	ShortExpiresTime time.Duration
+	Issuer           string
+}
+
+var JwtSetting = &Jwt{}
 
 // Setup initialize the configuration instance
 func Setup() {
@@ -74,7 +83,12 @@ func unmarshal() error {
 	if err := viper.UnmarshalKey("Database", &DatabaseSetting); err != nil {
 		return err
 	}
+	if err := viper.UnmarshalKey("Jwt", &JwtSetting); err != nil {
+		return err
+	}
 	ServerSetting.ReadTimeout = time.Second * ServerSetting.ReadTimeout
 	ServerSetting.WriteTimeout = time.Second * ServerSetting.WriteTimeout
+	JwtSetting.LongExpiresTime = time.Hour * JwtSetting.LongExpiresTime
+	JwtSetting.ShortExpiresTime = time.Minute * JwtSetting.ShortExpiresTime
 	return nil
 }

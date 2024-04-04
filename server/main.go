@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-	defer model.CloseDB()
+	fmt.Printf("Type of setting.JwtSetting.Secret: %T\n", setting.JwtSetting.Secret)
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
