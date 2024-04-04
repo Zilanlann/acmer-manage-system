@@ -22,7 +22,6 @@ func init() {
 }
 
 func main() {
-	fmt.Printf("Type of setting.JwtSetting.Secret: %T\n", setting.JwtSetting.Secret)
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()

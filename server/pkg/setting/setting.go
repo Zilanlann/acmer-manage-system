@@ -46,7 +46,7 @@ type Database struct {
 var DatabaseSetting = &Database{}
 
 type Jwt struct {
-	Secret           []byte
+	Secret           string
 	LongExpiresTime  time.Duration
 	ShortExpiresTime time.Duration
 	Issuer           string

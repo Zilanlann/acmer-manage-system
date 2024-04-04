@@ -13,8 +13,8 @@ import (
 )
 
 type auth struct {
-	Username string `valid:"Required; MaxSize(50)" json:"username" form:"username"`
-	Password string `valid:"Required; MaxSize(50)" json:"password" form:"password"`
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
 }
 
 // @Summary Login
@@ -25,26 +25,14 @@ type auth struct {
 // @Router /login [Post]
 func Login(c *gin.Context) {
 	appG := app.Gin{C: c}
-	valid := validation.Validation{}
 
 	var a auth
-	if err := c.ShouldBindJSON(&a); err != nil {
-		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-		return
-	}
-	ok, _ := valid.Valid(&a)
-
-	username := a.Username
-	password := a.Password
-
-	if !ok {
-		fmt.Println("valid.Errors")
-		app.MarkErrors(valid.Errors)
+	if err := c.ShouldBind(&a); err != nil {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
 
-	authService := auth_service.Auth{Password: password, Username: username}
+	authService := auth_service.Auth{Password: a.Password, Username: a.Username}
 	isExist, err := authService.Check()
 	if err != nil {
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
