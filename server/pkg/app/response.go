@@ -10,16 +10,36 @@ type Gin struct {
 }
 
 type Response struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"message"`
-	Data interface{} `json:"result"`
+	Success bool        `json:"success"`
+	Code    int         `json:"code"`
+	Msg     string      `json:"message"`
+	Data    interface{} `json:"result"`
 }
 
-// Response setting gin.JSON
-func (g *Gin) Response(httpCode, errCode int, data interface{}) {
+// SuccessResponse generates a success response with the provided HTTP status code, custom status code, and data.
+//
+// httpCode: the HTTP status code to return.
+// StatusCode: the custom status code.
+// data: the data to include in the response.
+func (g *Gin) SuccessResponse(httpCode, StatusCode int, data interface{}) {
 	g.C.JSON(httpCode, Response{
-		Code: errCode,
-		Msg:  e.GetMsg(errCode),
-		Data: data,
+		Success: true,
+		Code:    StatusCode,
+		Msg:     e.GetMsg(StatusCode),
+		Data:    data,
+	})
+}
+
+// ErrorResponse generates a error response with the provided HTTP status code, custom status code, and data.
+//
+// httpCode: the HTTP status code to return.
+// StatusCode: the custom status code.
+// data: the data to include in the response.
+func (g *Gin) ErrorResponse(httpCode, StatusCode int, data interface{}) {
+	g.C.JSON(httpCode, Response{
+		Success: true,
+		Code:    StatusCode,
+		Msg:     e.GetMsg(StatusCode),
+		Data:    data,
 	})
 }

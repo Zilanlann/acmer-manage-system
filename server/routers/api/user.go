@@ -29,7 +29,7 @@ func Login(c *gin.Context) {
 
 	var a auth
 	if err := c.ShouldBindJSON(&a); err != nil {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
 	ok, _ := valid.Valid(&a)
@@ -40,35 +40,34 @@ func Login(c *gin.Context) {
 	if !ok {
 		fmt.Println("valid.Errors")
 		app.MarkErrors(valid.Errors)
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
 
 	authService := auth_service.Auth{Password: password, Username: username}
 	isExist, err := authService.Check()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
+		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
 		return
 	}
 
 	if !isExist {
-		appG.Response(http.StatusUnauthorized, e.ERROR_NOT_VALID_USER, nil)
+		appG.ErrorResponse(http.StatusUnauthorized, e.ERROR_NOT_VALID_USER, nil)
 		return
 	}
 
-	token, err := utils.GenerateToken(username, password)
+	aToken, rToken, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_AUTH_TOKEN, nil)
+		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_AUTH_TOKEN, nil)
 		return
 	}
 
-	appG.Response(http.StatusOK, e.SUCCESS, map[string]interface{}{
-		"roles":    authService.Role,
-		"userId":   authService.UserId,
-		"username": authService.Username,
-		"realName": authService.RealName,
-		"desc":     authService.Desc,
-		"token":    token,
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"username":     authService.Username,
+		"roles":        authService.Role,
+		"accessToken":  aToken,
+		"refreshToken": rToken,
+		"expires":      "2030/10/30 00:00:00",
 	})
 }
 
@@ -92,15 +91,15 @@ func Register(c *gin.Context) {
 	if !ok {
 		fmt.Println("valid.Errors")
 		app.MarkErrors(valid.Errors)
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
 
 	authService := auth_service.Auth{Username: username, Password: password}
 	err := authService.Add()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
+		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
 		return
 	}
-	appG.Response(http.StatusOK, e.SUCCESS, nil)
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
 }

@@ -8,8 +8,6 @@ type Auth struct {
 	UserId   int
 	Username string
 	Password string
-	RealName string
-	Desc     string
 	Role     string
 }
 
@@ -24,8 +22,6 @@ func (a *Auth) Check() (bool, error) {
 		return false, err
 	}
 	a.Username = user.Username
-	a.RealName = user.RealName
-	a.Desc = user.Desc
 	a.Role = user.Role
 	return true, nil
 }

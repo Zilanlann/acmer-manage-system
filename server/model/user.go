@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/zilanlann/acmer-manage-system/server/utils"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -36,7 +36,7 @@ func CheckUser(username, password string) (int, error) {
 	var user User
 	err := db.Where("username = ?", username).First(&user).Error
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if err == gorm.ErrRecordNotFound {
 			return 0, nil // 用户存在，密码错误
 		}
 		return 0, err // 数据库错误
