@@ -13,7 +13,7 @@ type Response struct {
 	Success bool        `json:"success"`
 	Code    int         `json:"code"`
 	Msg     string      `json:"message"`
-	Data    interface{} `json:"result"`
+	Data    interface{} `json:"data"`
 }
 
 // SuccessResponse generates a success response with the provided HTTP status code, custom status code, and data.

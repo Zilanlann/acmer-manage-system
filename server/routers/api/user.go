@@ -55,7 +55,7 @@ func Login(c *gin.Context) {
 
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
 		"username":     authService.Username,
-		"roles":        authService.Role,
+		"roles":        []string{authService.Role},
 		"accessToken":  aToken,
 		"refreshToken": rToken,
 		"expires":      "2030/10/30 00:00:00",
