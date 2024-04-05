@@ -1,6 +1,6 @@
 {
-  "Version": "5.3.0",
-  "Title": "PureAdmin",
+  "Version": "0.0.1",
+  "Title": "ACMer管理系统",
   "FixedHeader": true,
   "HiddenSideBar": false,
   "MultiTagsCache": false,

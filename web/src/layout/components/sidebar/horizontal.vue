@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Search from "../search/index.vue";
-import Notice from "../notice/index.vue";
 import FullScreen from "./fullScreen.vue";
 import SidebarItem from "./sidebarItem.vue";
 import { isAllEmpty } from "@pureadmin/utils";
@@ -62,8 +61,6 @@ nextTick(() => {
       <Search id="header-search" />
       <!-- 全屏 -->
       <FullScreen id="full-screen" />
-      <!-- 消息通知 -->
-      <Notice id="header-notice" />
       <!-- 退出登录 -->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover">
