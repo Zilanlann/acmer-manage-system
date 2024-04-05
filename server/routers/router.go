@@ -4,7 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/zilanlann/acmer-manage-system/server/docs"
+	"github.com/zilanlann/acmer-manage-system/server/middleware"
 	"github.com/zilanlann/acmer-manage-system/server/routers/api"
+	v1 "github.com/zilanlann/acmer-manage-system/server/routers/api/v1"
 )
 
 func InitRouter() *gin.Engine {
@@ -15,10 +18,11 @@ func InitRouter() *gin.Engine {
 	r.POST("/login", api.Login)
 	r.POST("/register", api.Register)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// apiv1 := r.Group("/api/v1")
-	// apiv1.Use(jwt.JWT())
-	// {
-	// }
+	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
+	apiv1 := r.Group("/api/v1")
+	apiv1.Use(middleware.JWTAuth())
+	{
+		apiv1.GET("/test", v1.Test)
+	}
 	return r
 }

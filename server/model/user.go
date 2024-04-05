@@ -29,12 +29,12 @@ func AddUser(username, password string) error {
 	return db.Create(&User{Username: username, Password: hash, Role: "ACMer"}).Error
 }
 
-func CheckUser(username, password string) (int, error) {
+func CheckUser(username, password string) (id int, err error) {
 	if username == "" || password == "" {
 		return 0, nil
 	}
 	var user User
-	err := db.Where("username = ?", username).First(&user).Error
+	err = db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return 0, nil // 用户存在，密码错误

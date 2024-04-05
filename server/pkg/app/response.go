@@ -37,7 +37,7 @@ func (g *Gin) SuccessResponse(httpCode, StatusCode int, data interface{}) {
 // data: the data to include in the response.
 func (g *Gin) ErrorResponse(httpCode, StatusCode int, data interface{}) {
 	g.C.JSON(httpCode, Response{
-		Success: true,
+		Success: false,
 		Code:    StatusCode,
 		Msg:     e.GetMsg(StatusCode),
 		Data:    data,

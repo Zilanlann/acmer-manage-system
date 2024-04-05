@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -18,7 +19,7 @@ type Claims struct {
 }
 
 func GenTokens(userID int, username string, role string) (aToken, rToken string, err error) {
-	calims := Claims{
+	claims := Claims{
 		UserID:   userID,
 		Username: username,
 		Role:     role,
@@ -27,8 +28,9 @@ func GenTokens(userID int, username string, role string) (aToken, rToken string,
 			Issuer:    setting.JwtSetting.Issuer,                                 // 签发人
 		},
 	}
+	fmt.Printf("claims.ExpiresAt: %v\n", claims.ExpiresAt)
 	// 使用指定的签名方法创建签名对象
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, calims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// 生成 aToken
 	aToken, err = token.SignedString(jwtSecret)
 	if err != nil {
@@ -69,7 +71,7 @@ func RefreshToken(aToken, rToken string) (newToken, newrToken string, err error)
 		return "", "", err
 	}
 
-	// 第二步：从旧的 aToken 中解析出 cliams 数据   过期了还能解析出来吗
+	// 第二步：从旧的 aToken 中解析出 cliams 数据
 	var claims Claims
 	_, err = jwt.ParseWithClaims(aToken, &claims, KeyFunc)
 	v, _ := err.(*jwt.ValidationError)
@@ -83,4 +85,15 @@ func RefreshToken(aToken, rToken string) (newToken, newrToken string, err error)
 
 func KeyFunc(token *jwt.Token) (interface{}, error) {
 	return jwtSecret, nil
+}
+
+func Test() {
+	aToken, rToken, err := GenTokens(1, "zilanlann", "admin")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(aToken)
+	fmt.Println(rToken)
+	claim, _ := ParseToken(aToken)
+	fmt.Println(claim)
 }

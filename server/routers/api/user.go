@@ -1,10 +1,8 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/app"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/e"
@@ -17,12 +15,17 @@ type auth struct {
 	Password string `json:"password" form:"password" binding:"required"`
 }
 
-// @Summary Login
-// @Produce json
-// @Param auth body auth true "用户登录信息"
-// @Success 200 {object} app.Response
-// @Failure 500 {object} app.Response
-// @Router /login [Post]
+//	@Summary		User login
+//	@Description	Authenticates a user and returns access and refresh tokens
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			auth	body		auth			true	"Login Credentials"
+//	@Success		200		{object}	app.Response	"Returns username, roles, accessToken, refreshToken, and token expiry"
+//	@Failure		400		{object}	app.Response	"Invalid Parameters"
+//	@Failure		401		{object}	app.Response	"Not Valid User"
+//	@Failure		500		{object}	app.Response	"Internal Server Error or Failed to Generate Token"
+//	@Router			/login [post]
 func Login(c *gin.Context) {
 	appG := app.Gin{C: c}
 
@@ -33,20 +36,20 @@ func Login(c *gin.Context) {
 	}
 
 	authService := auth_service.Auth{Password: a.Password, Username: a.Username}
-	isExist, err := authService.Check()
+
+	ok, err := authService.Check()
 	if err != nil {
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
 		return
 	}
-
-	if !isExist {
+	if !ok {
 		appG.ErrorResponse(http.StatusUnauthorized, e.ERROR_NOT_VALID_USER, nil)
 		return
 	}
 
 	aToken, rToken, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
 	if err != nil {
-		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_AUTH_TOKEN, nil)
+		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_GEN_TOKEN, nil)
 		return
 	}
 
@@ -59,31 +62,25 @@ func Login(c *gin.Context) {
 	})
 }
 
-// @Summary Register
-// @Produce json
-// @Param username formData string true "userName"
-// @Param password formData string true "password"
-// @Success 200 {object} app.Response
-// @Failure 500 {object} app.Response
-// @Router /register [Post]
+//	@Summary		Register a new user
+//	@Description	creates a new user with the provided credentials
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			auth	body		auth					true	"User Credentials"
+//	@Success		200		{object}	map[string]interface{}	"Successfully registered"
+//	@Failure		400		{object}	map[string]interface{}	"Invalid parameters"
+//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Router			/register [post]
 func Register(c *gin.Context) {
 	appG := app.Gin{C: c}
-	valid := validation.Validation{}
 
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-
-	a := auth{Username: username, Password: password}
-	ok, _ := valid.Valid(&a)
-
-	if !ok {
-		fmt.Println("valid.Errors")
-		app.MarkErrors(valid.Errors)
+	var a auth
+	if err := c.ShouldBind(&a); err != nil {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
-
-	authService := auth_service.Auth{Username: username, Password: password}
+	authService := auth_service.Auth{Username: a.Username, Password: a.Password}
 	err := authService.Add()
 	if err != nil {
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
