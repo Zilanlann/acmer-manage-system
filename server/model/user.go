@@ -13,7 +13,7 @@ type User struct {
 	Desc     string `gorm:"type:text"`
 	Password string `gorm:"size:255;not null"`
 	// HomePath string `gorm:"size:255"`
-	Role string `gorm:"type:enum('Super Admin', 'Teacher', 'ACMer');not null"`
+	Role string `gorm:"type:enum('admin', 'teacher', 'acmer');not null"`
 }
 
 // AddUser adds a new user to the database with the given username and password.
@@ -26,7 +26,11 @@ type User struct {
 // - error: an error if there was a problem adding the user to the database.
 func AddUser(username, password string) error {
 	hash := utils.BcryptHash(password)
-	return db.Create(&User{Username: username, Password: hash, Role: "ACMer"}).Error
+	return db.Create(&User{Username: username, Password: hash, Role: "acmer"}).Error
+}
+
+func DeleteUser(id int) error {
+	return db.Where("id = ?", id).Delete(&User{}).Error
 }
 
 func CheckUser(username, password string) (id int, err error) {

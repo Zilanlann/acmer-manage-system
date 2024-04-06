@@ -89,6 +89,6 @@ func unmarshal() error {
 	ServerSetting.ReadTimeout = time.Second * ServerSetting.ReadTimeout
 	ServerSetting.WriteTimeout = time.Second * ServerSetting.WriteTimeout
 	JwtSetting.LongExpiresTime = time.Hour * JwtSetting.LongExpiresTime
-	JwtSetting.ShortExpiresTime = time.Minute * JwtSetting.ShortExpiresTime
+	JwtSetting.ShortExpiresTime = time.Hour * JwtSetting.ShortExpiresTime
 	return nil
 }

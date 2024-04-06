@@ -47,7 +47,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	aToken, rToken, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
+	aToken, rToken, exTime, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
 	if err != nil {
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_GEN_TOKEN, nil)
 		return
@@ -58,7 +58,7 @@ func Login(c *gin.Context) {
 		"roles":        []string{authService.Role},
 		"accessToken":  aToken,
 		"refreshToken": rToken,
-		"expires":      "2030/10/30 00:00:00",
+		"expires":      exTime,
 	})
 }
 
