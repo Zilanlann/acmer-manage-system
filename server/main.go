@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zilanlann/acmer-manage-system/server/mail"
 	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
@@ -25,21 +24,17 @@ func init() {
 }
 
 func main() {
-	mail.SendCode("123456", "666zilan666@gmail.com")
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
-	readTimeout := setting.ServerSetting.ReadTimeout
-	writeTimeout := setting.ServerSetting.WriteTimeout
 	endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
-	maxHeaderBytes := 1 << 20
 
 	s := &http.Server{
 		Addr:           endPoint,
 		Handler:        routersInit,
-		ReadTimeout:    readTimeout,
-		WriteTimeout:   writeTimeout,
-		MaxHeaderBytes: maxHeaderBytes,
+		ReadTimeout:    setting.ServerSetting.ReadTimeout,
+		WriteTimeout:   setting.ServerSetting.WriteTimeout,
+		MaxHeaderBytes: 1 << 20,
 	}
 
 	go func() {

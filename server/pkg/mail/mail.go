@@ -33,9 +33,9 @@ func SendCode(code, email string) {
 	request.Destination = common.StringPtrs([]string{email})
 	request.Template = &ses.Template{
 		TemplateID:   common.Uint64Ptr(setting.TencentSetting.MailTempID),
-		TemplateData: common.StringPtr(fmt.Sprintf("{code: %s}", code)),
+		TemplateData: common.StringPtr(fmt.Sprintf("{\"code\": \"%s\"}", code)),
 	}
-	request.Subject = common.StringPtr("YourTestSubject")
+	request.Subject = common.StringPtr("【YCIT AMS】邮箱绑定验证")
 
 	// 返回的resp是一个SendEmailResponse的实例，与请求对象对应
 	response, err := client.SendEmail(request)
