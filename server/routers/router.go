@@ -14,11 +14,14 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
 
 	r.POST("/login", api.Login)
 	r.POST("/register", api.Register)
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
+	r.POST("/refresh-token", api.RefreshToken)
+	
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(middleware.JWTAuth())
 	{

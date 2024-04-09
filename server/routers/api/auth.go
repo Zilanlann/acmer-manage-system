@@ -67,10 +67,10 @@ func Login(c *gin.Context) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			auth	body		auth					true	"User Credentials"
-//	@Success		200		{object}	map[string]interface{}	"Successfully registered"
-//	@Failure		400		{object}	map[string]interface{}	"Invalid parameters"
-//	@Failure		500		{object}	map[string]interface{}	"Internal server error"
+//	@Param			auth	body		auth			true	"User Credentials"
+//	@Success		200		{object}	app.Response	"Successfully registered"
+//	@Failure		400		{object}	app.Response	"Invalid parameters"
+//	@Failure		500		{object}	app.Response	"Internal server error"
 //	@Router			/register [post]
 func Register(c *gin.Context) {
 	appG := app.Gin{C: c}
@@ -83,7 +83,7 @@ func Register(c *gin.Context) {
 	authService := auth_service.Auth{Username: a.Username, Password: a.Password}
 	err := authService.Add()
 	if err != nil {
-		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
+		appG.ErrorResponse(http.StatusInternalServerError, e.USER_ALREADY_EXIST, nil)
 		return
 	}
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)

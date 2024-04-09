@@ -9,6 +9,8 @@ var MsgFlags = map[int]string{
 	ERROR_AUTH:            "Token错误",
 	ERROR_NOT_VALID_USER:  "用户名或密码错误",
 	ERROR_TOKEN_INVALID:   "Token无效",
+	INVALID_REFRESH_TOKEN: "RefreshToken无效",
+	USER_ALREADY_EXIST:    "用户已存在",
 }
 
 func GetMsg(code int) string {

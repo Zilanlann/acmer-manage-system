@@ -19,11 +19,11 @@ func BcryptCheck(password, hash string) bool {
 	return err == nil
 }
 
-// @author: [piexlmax](https://github.com/piexlmax)
-// @function: MD5V
-// @description: md5加密
-// @param: str []byte
-// @return: string
+//	@author:		[piexlmax](https://github.com/piexlmax)
+//	@function:		MD5V
+//	@description:	md5加密
+//	@param:			str []byte
+//	@return:		string
 func MD5V(str []byte, b ...byte) string {
 	h := md5.New()
 	h.Write(str)

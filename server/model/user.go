@@ -7,13 +7,14 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"size:255;not null"`
-	RealName string `gorm:"size:255"`
-	Avatar   string `gorm:"size:255"`
-	Desc     string `gorm:"type:text"`
-	Password string `gorm:"size:255;not null"`
-	// HomePath string `gorm:"size:255"`
-	Role string `gorm:"type:enum('admin', 'teacher', 'acmer');not null"`
+	Username  string `gorm:"size:255;not null;unique"`
+	RealName  string `gorm:"size:30"`
+	StudentID string `gorm:"size:30"`
+	Class     string `gorm:"size:30"`
+	Avatar    string `gorm:"size:255"`
+	Desc      string `gorm:"type:text"`
+	Password  string `gorm:"size:255;not null"`
+	Role      string `gorm:"type:enum('admin', 'teacher', 'stuCoach', 'acmer');not null"`
 }
 
 // AddUser adds a new user to the database with the given username and password.
@@ -55,4 +56,19 @@ func GetUserInfo(id int) (User, error) {
 	var user User
 	err := db.Where("id = ?", id).First(&user).Error
 	return user, err
+}
+
+func UpdateUserRole(id int, role string) error {
+	return db.Where("id = ?", id).Update("role", role).Error
+}
+
+func GetAllUsers() ([]User, error) {
+	var users []User
+	err := db.Find(&users).Error
+	return users, err
+}
+
+func AddAdmin() error {
+	hash := utils.BcryptHash("adminadmin123")
+	return db.Create(&User{Username: "admin", Password: hash, Role: "admin"}).Error
 }

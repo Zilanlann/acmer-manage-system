@@ -37,6 +37,7 @@ func Setup() {
 	sqlDB.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenConns)
 
 	db.AutoMigrate(&User{})
+	AddAdmin()
 
 	CasbinSetup()
 }

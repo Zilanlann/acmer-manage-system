@@ -8,21 +8,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// type App struct {
-// 	JwtSecret string
-// 	PageSize  int
-// 	PrefixUrl string
-
-// 	RuntimeRootPath string
-
-// 	LogSavePath string
-// 	LogSaveName string
-// 	LogFileExt  string
-// 	TimeFormat  string
-// }
-
-// var AppSetting = &App{}
-
 type Server struct {
 	RunMode      string
 	HttpPort     int
@@ -54,6 +39,23 @@ type Jwt struct {
 
 var JwtSetting = &Jwt{}
 
+type Redis struct {
+	Host     string
+	Password string
+	DB       int
+}
+
+var RedisSetting = &Redis{}
+
+type Tencent struct {
+	SecretId  string
+	SecretKey string
+	MailTempID  uint64
+	MailFrom  string
+}
+
+var TencentSetting = &Tencent{}
+
 // Setup initialize the configuration instance
 func Setup() {
 	viper.SetConfigName("config")
@@ -84,6 +86,12 @@ func unmarshal() error {
 		return err
 	}
 	if err := viper.UnmarshalKey("Jwt", &JwtSetting); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("Redis", &RedisSetting); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("Tencent", &TencentSetting); err != nil {
 		return err
 	}
 	ServerSetting.ReadTimeout = time.Second * ServerSetting.ReadTimeout
