@@ -1,6 +1,6 @@
 {
-  "name": "pure-admin-thin",
-  "version": "5.3.0",
+  "name": "acmer-manage-system",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -69,6 +69,7 @@
     "responsive-storage": "^2.2.0",
     "sortablejs": "^1.15.2",
     "vue": "^3.4.21",
+    "vue-echarts": "^6.6.9",
     "vue-router": "^4.3.0",
     "vue-tippy": "^6.4.1",
     "vue-types": "^5.1.1"

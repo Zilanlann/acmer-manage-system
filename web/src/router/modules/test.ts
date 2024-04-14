@@ -1,17 +1,17 @@
 export default {
-  path: "/test",
-  redirect: "/test/index",
+  path: "/",
+  redirect: "/test",
   meta: {
-    icon: "twemoji:curling-stone",
+    icon: "tdesign:pearl-of-the-orient",
     // showLink: false,
-    title: "测试页面目录",
-    rank: 99
+    title: "测试页面",
+    rank: 20
   },
   children: [
     {
-      path: "/test/index",
-      name: "Test",
-      component: () => import("@/views/test.vue"),
+      path: "/test",
+      name: "test",
+      component: () => import("@/views/testPage/index.vue"),
       meta: {
         title: "测试页面"
       }

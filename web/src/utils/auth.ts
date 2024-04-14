@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { storageLocal } from "@pureadmin/utils";
 import { useUserStoreHook } from "@/store/modules/user";
+import { avatar } from "@/views/login/utils/static";
 
 export interface DataInfo<T> {
   /** token */
@@ -13,6 +14,8 @@ export interface DataInfo<T> {
   username?: string;
   /** 当前登陆用户的角色 */
   roles?: Array<string>;
+  /** 头像 */
+  avatar?: string;
 }
 
 export const userKey = "user-info";
@@ -28,9 +31,18 @@ export const multipleTabsKey = "multiple-tabs";
 /** 获取`token` */
 export function getToken(): DataInfo<number> {
   // 此处与`TokenKey`相同，此写法解决初始化时`Cookies`中不存在`TokenKey`报错
-  return Cookies.get(TokenKey)
+  const data = Cookies.get(TokenKey)
     ? JSON.parse(Cookies.get(TokenKey))
     : storageLocal().getItem(userKey);
+  const refreshToken =
+    storageLocal().getItem<DataInfo<number>>(userKey)?.refreshToken;
+  const accessToken = data?.accessToken;
+  const expires = data?.expires;
+  return {
+    accessToken,
+    expires,
+    refreshToken
+  };
 }
 
 /**
@@ -62,26 +74,30 @@ export function setToken(data: DataInfo<Date>) {
       : {}
   );
 
-  function setUserKey(username: string, roles: Array<string>) {
+  function setUserKey(username: string, roles: Array<string>, avatar: string) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
+    useUserStoreHook().SET_AVATAR(avatar);
     storageLocal().setItem(userKey, {
       refreshToken,
       expires,
       username,
-      roles
+      roles,
+      avatar
     });
   }
 
-  if (data.username && data.roles) {
-    const { username, roles } = data;
-    setUserKey(username, roles);
+  if (data.username && data.roles && data.avatar) {
+    const { username, roles, avatar } = data;
+    setUserKey(username, roles, avatar);
   } else {
     const username =
       storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
     const roles =
       storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
-    setUserKey(username, roles);
+    const avatar =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
+    setUserKey(username, roles, avatar);
   }
 }
 

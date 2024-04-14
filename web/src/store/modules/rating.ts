@@ -9,8 +9,8 @@ import type { UserResult, RefreshTokenResult } from "@/api/user";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
-export const useUserStore = defineStore({
-  id: "pure-user",
+export const useUsersStateStore = defineStore({
+  id: "users-state",
   state: (): userType => ({
     // 用户名
     username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
@@ -87,5 +87,5 @@ export const useUserStore = defineStore({
 });
 
 export function useUserStoreHook() {
-  return useUserStore(store);
+  return useUsersStateStore(store);
 }

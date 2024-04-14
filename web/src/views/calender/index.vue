@@ -1,11 +1,11 @@
 <script setup lang="ts">
 defineOptions({
-  name: "Test"
+  name: "Calendar"
 });
 </script>
 
 <template>
-  <div>test</div>
+  <ElCalendar></ElCalendar>
 </template>
 
 <style lang="scss" scoped></style>
