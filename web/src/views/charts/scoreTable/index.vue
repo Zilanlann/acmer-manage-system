@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useColumns } from "./columns";
 import smallPie from "@/views/charts/pieCharts/small/index.vue";
+import { ref, onMounted, onUnmounted } from "vue";
+
+defineOptions({
+  name: "ScoreTable"
+});
 
 const {
   loading,
@@ -11,14 +16,26 @@ const {
   tableSize,
   pagination,
   loadingConfig,
-  onChange,
-  onSizeChange,
   onCurrentChange
 } = useColumns();
+
+const height = ref(document.body.clientHeight - 255);
+
+const updateHeight = () => {
+  height.value = document.body.clientHeight - 255;
+};
+
+onMounted(() => {
+  window.addEventListener("resize", updateHeight);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateHeight);
+});
 </script>
 
 <template>
-  <div style="width: 100%">
+  <div style="width: 100%; height: 100%">
     <el-space class="float-right mb-4">
       <!-- <p class="text-sm">多选：</p>
       <el-radio-group v-model="select" size="small">
@@ -26,10 +43,6 @@ const {
         <el-radio-button value="no">否</el-radio-button>
       </el-radio-group> -->
       <p class="text-sm">是否隐藏饼图：</p>
-      <!-- <el-radio-group v-model="hideVal" size="small">
-        <el-radio-button value="nohide">不隐藏</el-radio-button>
-        <el-radio-button value="hidePie">隐藏饼图</el-radio-button>
-      </el-radio-group> -->
       <el-switch v-model="hidePie" />
       <!-- <el-divider direction="vertical" /> -->
     </el-space>
@@ -42,7 +55,7 @@ const {
       :size="tableSize as any"
       :loading="loading"
       :loading-config="loadingConfig"
-      :height="tableSize === 'small' ? 352 : 700"
+      :height="height"
       :data="
         dataList.slice(
           (pagination.currentPage - 1) * pagination.pageSize,
@@ -51,7 +64,6 @@ const {
       "
       :columns="columns"
       :pagination="pagination"
-      @page-size-change="onSizeChange"
       @page-current-change="onCurrentChange"
     >
       <template #echart="{ index }">

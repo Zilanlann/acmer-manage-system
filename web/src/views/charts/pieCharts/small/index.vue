@@ -1,5 +1,7 @@
 <template>
-  <v-chart class="w-full h-[100px]" :option="option" autoresize />
+  <div>
+    <v-chart class="w-full h-[100px]" :option="option" autoresize />
+  </div>
 </template>
 
 <script setup>
@@ -13,6 +15,10 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide } from "vue";
+
+defineOptions({
+  name: "PieChartSmall"
+});
 
 use([
   CanvasRenderer,

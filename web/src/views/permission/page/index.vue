@@ -24,21 +24,13 @@ const options = [
     label: "管理员角色"
   },
   {
-    value: "common",
+    value: "acmer",
     label: "普通角色"
   }
 ];
 
 function onChange() {
   useUserStoreHook().logOut();
-  // .loginByUsername({ username: username.value, password: "admin123" })
-  // .then(res => {
-  //   if (res.success) {
-  //     storageLocal().removeItem("async-routes");
-  //     usePermissionStoreHook().clearAllCachePage();
-  //     initRouter();
-  //   }
-  // });
 }
 </script>
 

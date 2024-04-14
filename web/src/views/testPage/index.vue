@@ -6,9 +6,13 @@ import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 defineOptions({
   name: "TestPage"
 });
-function onTest() {
-  useTestStoreHook().testApi();
-  message(useTestStoreHook().test, { type: "success" });
+async function onTest() {
+  try {
+    const result = await useTestStoreHook().testApi();
+    message(useTestStoreHook().test, { type: "success" });
+  } catch (error) {
+    console.error("Test API Failed:", error);
+  }
 }
 </script>
 
