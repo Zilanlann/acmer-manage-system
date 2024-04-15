@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { message } from "@/utils/message";
 import { useTestStoreHook } from "@/store/modules/test";
-import { ref, reactive, toRaw, onMounted, onBeforeUnmount } from "vue";
-import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+import PieChartNormal from "@/views/charts/pieCharts/normal/index.vue";
 defineOptions({
   name: "TestPage"
 });
@@ -19,6 +18,7 @@ async function onTest() {
 <template>
   <div>
     <el-button type="primary" @click="onTest">测试</el-button>
+    <PieChartNormal />
   </div>
 </template>
 

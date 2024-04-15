@@ -22,7 +22,7 @@ export const useTestStore = defineStore({
       // 将获取的test设置到Pinia的state中
       this.SET_TEST(result.data.expires);
     },
-    async testApi(data) {
+    async testApi() {
       return new Promise<TestResult>((resolve, reject) => {
         getTest()
           .then(data => {

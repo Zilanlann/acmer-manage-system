@@ -1,5 +1,6 @@
 export default {
   path: "/",
+  name: "Test",
   redirect: "/test",
   meta: {
     icon: "tdesign:pearl-of-the-orient",
@@ -10,7 +11,7 @@ export default {
   children: [
     {
       path: "/test",
-      name: "test",
+      name: "TestPage",
       component: () => import("@/views/testPage/index.vue"),
       meta: {
         title: "测试页面"

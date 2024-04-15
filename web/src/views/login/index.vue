@@ -55,6 +55,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             addPathMatch();
             router.push("/");
           }
+        })
+        .catch(error => {
+          message("登录失败", { type: "error" });
+          loading.value = false;
         });
     } else {
       loading.value = false;
