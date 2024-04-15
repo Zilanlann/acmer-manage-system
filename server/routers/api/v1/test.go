@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,9 @@ import (
 
 func Test(c *gin.Context) {
 	appG := app.Gin{C: c}
-	
+
+	fmt.Println(c.Request.Method, "  ", c.Request.RequestURI)
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
-		"expires":      "asdadadad",
+		"expires": "asdadadad",
 	})
 }

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/app"
@@ -15,6 +16,15 @@ func JWTAuth() func(c *gin.Context) {
 		atoken := c.Request.Header.Get("Authorization")
 		if atoken == "" {
 			appG.ErrorResponse(http.StatusBadRequest, e.ERROR_TOKEN_INVALID, nil)
+			c.Abort()
+			return
+		}
+		// 检查token是否以"Bearer "开头，如果是则去除"Bearer "前缀
+		if strings.HasPrefix(atoken, "Bearer ") {
+			atoken = strings.TrimPrefix(atoken, "Bearer ")
+		} else {
+			// 如果没有Bearer前缀，返回错误响应
+			appG.ErrorResponse(http.StatusBadRequest, e.AUTH_TOKEN_REQUIRED, nil)
 			c.Abort()
 			return
 		}

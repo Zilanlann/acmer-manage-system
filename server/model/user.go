@@ -27,7 +27,7 @@ type User struct {
 // - error: an error if there was a problem adding the user to the database.
 func AddUser(username, password string) error {
 	hash := utils.BcryptHash(password)
-	return db.Create(&User{Username: username, Password: hash, Role: "acmer"}).Error
+	return db.Create(&User{Username: username, Password: hash, Role: "acmer", Avatar: "https://userpic.codeforces.org/no-avatar.jpg"}).Error
 }
 
 func DeleteUser(id int) error {
@@ -59,7 +59,11 @@ func GetUserInfo(id int) (User, error) {
 }
 
 func UpdateUserRole(id int, role string) error {
-	return db.Where("id = ?", id).Update("role", role).Error
+	return db.Model(&User{}).Where("id = ?", id).Update("role", role).Error
+}
+
+func UpdateUserAvatar(id int, avatar string) error {
+	return db.Model(&User{}).Where("id = ?", id).Update("avatar", avatar).Error
 }
 
 func GetAllUsers() ([]User, error) {

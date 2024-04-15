@@ -6,6 +6,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/zilanlann/acmer-manage-system/server/docs"
 	"github.com/zilanlann/acmer-manage-system/server/middleware"
+	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/routers/api"
 	v1 "github.com/zilanlann/acmer-manage-system/server/routers/api/v1"
 )
@@ -18,13 +19,15 @@ func InitRouter() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
 
-	r.POST("/login", api.Login)
-	r.POST("/register", api.Register)
-	r.POST("/refresh-token", api.RefreshToken)
+	noAuth := r.Group("/api")
+	noAuth.POST("/login", api.Login)
+	noAuth.POST("/register", api.Register)
+	noAuth.POST("/refresh-token", api.RefreshToken)
 	
 	apiv1 := r.Group("/api/v1")
-	apiv1.Use(middleware.JWTAuth())
+	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
+		model.Casbin.AddPolicy("admin", "/api/v1/test", "GET")
 		apiv1.GET("/test", v1.Test)
 	}
 	return r

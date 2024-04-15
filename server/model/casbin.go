@@ -6,13 +6,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var casbinEnforcer *casbin.Enforcer
+var Casbin *casbin.Enforcer
 
 func CasbinSetup() {
 	a, _ := gormadapter.NewAdapterByDB(db)
-	casbinEnforcer, _ = casbin.NewEnforcer("./conf/model.conf", a)
+	Casbin, _ = casbin.NewEnforcer("./conf/model.conf", a)
 
-	casbinEnforcer.LoadPolicy()
+	Casbin.LoadPolicy()
 
 	// casbinEnforcer.AddPolicy("Super Admin", "data1", "read")
 	// // Check the permission.

@@ -55,6 +55,7 @@ func Login(c *gin.Context) {
 
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
 		"username":     authService.Username,
+		"avatar":       authService.Avatar,
 		"roles":        []string{authService.Role},
 		"accessToken":  aToken,
 		"refreshToken": rToken,

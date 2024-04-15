@@ -9,6 +9,7 @@ type Auth struct {
 	Username string
 	Password string
 	Role     string
+	Avatar   string
 }
 
 func (a *Auth) Check() (bool, error) {
@@ -23,6 +24,7 @@ func (a *Auth) Check() (bool, error) {
 	}
 	a.Username = user.Username
 	a.Role = user.Role
+	a.Avatar = user.Avatar
 	return true, nil
 }
 
