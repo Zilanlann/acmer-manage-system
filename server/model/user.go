@@ -14,7 +14,7 @@ type User struct {
 	Avatar    string `gorm:"size:255"`
 	Desc      string `gorm:"type:text"`
 	Password  string `gorm:"size:255;not null"`
-	Role      string `gorm:"type:enum('admin', 'teacher', 'stuCoach', 'acmer');not null"`
+	Role      string `gorm:"size:30;not null"`
 }
 
 // AddUser adds a new user to the database with the given username and password.
@@ -74,5 +74,5 @@ func GetAllUsers() ([]User, error) {
 
 func AddAdmin() error {
 	hash := utils.BcryptHash("adminadmin123")
-	return db.Create(&User{Username: "admin", Password: hash, Role: "admin"}).Error
+	return db.Create(&User{Username: "admin", Password: hash, Avatar: "https://userpic.codeforces.org/no-avatar.jpg", Role: "admin"}).Error
 }

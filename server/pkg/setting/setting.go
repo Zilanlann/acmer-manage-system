@@ -33,6 +33,7 @@ type Database struct {
 	User         string `mapstructure:"user"`
 	Password     string `mapstructure:"password"`
 	Host         string `mapstructure:"host"`
+	Port         string `mapstructure:"port"`
 	Name         string `mapstructure:"name"`
 	TablePrefix  string `mapstructure:"table_prefix"`
 	MaxIdleConns int    `mapstructure:"max_idle_conns"`
