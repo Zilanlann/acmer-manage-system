@@ -14,6 +14,7 @@ import (
 func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
+	r.Use(middleware.CORS())
 	r.Use(gin.Recovery())
 	
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
