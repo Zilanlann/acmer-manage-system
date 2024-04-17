@@ -42,6 +42,7 @@ export type userType = {
   avatar?: string;
   isRemembered?: boolean;
   loginDay?: number;
+  currentPage?: number;
 };
 
 export type testType = {

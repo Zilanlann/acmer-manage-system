@@ -3,6 +3,8 @@ import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
+import register from "./components/register.vue";
+import update from "./components/update.vue";
 import { useNav } from "@/layout/hooks/useNav";
 import type { FormInstance } from "element-plus";
 import { useLayout } from "@/layout/hooks/useLayout";
@@ -10,7 +12,14 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu, addPathMatch } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import { ref, reactive, toRaw, onMounted, onBeforeUnmount } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  toRaw,
+  onMounted,
+  onBeforeUnmount
+} from "vue";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 
 import dayIcon from "@/assets/svg/day.svg?component";
@@ -36,6 +45,10 @@ const { title } = useNav();
 const ruleForm = reactive({
   username: "",
   password: ""
+});
+
+const currentPage = computed(() => {
+  return useUserStoreHook().currentPage;
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -108,6 +121,7 @@ onBeforeUnmount(() => {
           </Motion>
 
           <el-form
+            v-if="currentPage === 0"
             ref="ruleFormRef"
             :model="ruleForm"
             :rules="loginRules"
@@ -146,17 +160,47 @@ onBeforeUnmount(() => {
             </Motion>
 
             <Motion :delay="250">
-              <el-button
-                class="w-full mt-4"
-                size="default"
-                type="primary"
-                :loading="loading"
-                @click="onLogin(ruleFormRef)"
-              >
-                登录
-              </el-button>
+              <el-form-item>
+                <div class="w-full h-[20px] flex justify-end items-center">
+                  <el-button
+                    link
+                    type="primary"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(2)"
+                  >
+                    忘记密码
+                  </el-button>
+                </div>
+                <el-button
+                  class="w-full mt-4"
+                  size="default"
+                  type="primary"
+                  :loading="loading"
+                  @click="onLogin(ruleFormRef)"
+                >
+                  登录
+                </el-button>
+              </el-form-item>
+            </Motion>
+
+            <Motion :delay="300">
+              <el-form-item>
+                <div class="w-full h-[20px] flex justify-between items-center">
+                  <el-button
+                    class="w-full mt-4"
+                    size="default"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(1)"
+                  >
+                    注册
+                  </el-button>
+                </div>
+              </el-form-item>
             </Motion>
           </el-form>
+
+          <!-- 注册 -->
+          <register v-if="currentPage === 1" />
+          <!-- 忘记密码 -->
+          <update v-if="currentPage === 2" />
         </div>
       </div>
     </div>
