@@ -7,8 +7,7 @@ defineOptions({
 });
 async function onTest() {
   try {
-    message(useTestStoreHook().test, { type: "success" });
-    await useTestStoreHook().testApi();
+    const result = await useTestStoreHook().testApi();
     message(useTestStoreHook().test, { type: "success" });
   } catch (error) {
     console.error("Test API Failed:", error);

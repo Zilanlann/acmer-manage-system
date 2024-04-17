@@ -1,4 +1,8 @@
 export const baseUrlApi = (url: string) =>
-  `https://ams-server.fly.dev/api/${url}`;
+  process.env.NODE_ENV === "development"
+    ? `/api/${url}`
+    : `https://ams-server.fly.dev/api/${url}`;
 export const v1BaseUrlApi = (url: string) =>
-  `https://ams-server.fly.dev/api/v1/${url}`;
+  process.env.NODE_ENV === "development"
+    ? `/api/v1/${url}`
+    : `https://ams-server.fly.dev/api/v1/${url}`;

@@ -16,22 +16,25 @@ export const useTestStore = defineStore({
       this.test = test;
     },
     /** test */
-    async aaa() {
-      // 调用getTest获取测试结果
-      const result = await getTest();
-      // 将获取的test设置到Pinia的state中
-      this.SET_TEST(result.data.expires);
-    },
     async testApi() {
       return new Promise<TestResult>((resolve, reject) => {
+        console.log("Start testApi - requesting getTest");
         getTest()
           .then(data => {
+            console.log("Data received from getTest:", data);
             if (data) {
+              console.log(
+                "Data is valid - setting test and resolving promise."
+              );
               this.SET_TEST(data.data.expires);
               resolve(data);
+            } else {
+              console.log("Received data is null or undefined.");
+              reject(data);
             }
           })
           .catch(error => {
+            console.log("Error occurred in getTest:", error);
             reject(error);
           });
       });
