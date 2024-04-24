@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
 import register from "./components/register.vue";
-import update from "./components/update.vue";
+import forget from "./components/forget.vue";
 import { useNav } from "@/layout/hooks/useNav";
 import type { FormInstance } from "element-plus";
 import { useLayout } from "@/layout/hooks/useLayout";
@@ -200,7 +200,7 @@ onBeforeUnmount(() => {
           <!-- 注册 -->
           <register v-if="currentPage === 1" />
           <!-- 忘记密码 -->
-          <update v-if="currentPage === 2" />
+          <forget v-if="currentPage === 2" />
         </div>
       </div>
     </div>
