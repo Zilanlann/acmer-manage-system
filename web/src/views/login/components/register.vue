@@ -2,7 +2,7 @@
 import { ref, reactive } from "vue";
 import Motion from "../utils/motion";
 import { message } from "@/utils/message";
-import { updateRules } from "../utils/rule";
+import { registerRules } from "../utils/rule";
 import type { FormInstance } from "element-plus";
 // import { useVerifyCode } from "../utils/verifyCode";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -20,7 +20,9 @@ const ruleForm = reactive({
   verifyCode: "",
   password: "",
   repeatPassword: "",
-  realname: ""
+  realname: "",
+  cfHandle: "",
+  atcHandle: ""
 });
 const ruleFormRef = ref<FormInstance>();
 const { isDisabled, text } = useVerifyCode();
@@ -75,7 +77,7 @@ function onBack() {
   <el-form
     ref="ruleFormRef"
     :model="ruleForm"
-    :rules="updateRules"
+    :rules="registerRules"
     size="large"
   >
     <Motion>
@@ -83,7 +85,7 @@ function onBack() {
         :rules="[
           {
             required: true,
-            message: 'Please enter your username',
+            message: '请输入用户名',
             trigger: 'blur'
           }
         ]"
@@ -99,7 +101,16 @@ function onBack() {
     </Motion>
 
     <Motion :delay="100">
-      <el-form-item prop="realname">
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '请输入你的真实姓名',
+            trigger: 'blur'
+          }
+        ]"
+        prop="realname"
+      >
         <el-input
           v-model="ruleForm.realname"
           clearable
@@ -110,7 +121,16 @@ function onBack() {
     </Motion>
 
     <Motion :delay="100">
-      <el-form-item prop="email">
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '请输入你的邮箱',
+            trigger: 'blur'
+          }
+        ]"
+        prop="email"
+      >
         <el-input
           v-model="ruleForm.email"
           clearable
@@ -138,6 +158,31 @@ function onBack() {
           </el-button>
         </div>
       </el-form-item>
+    </Motion>
+
+    <Motion :delay="200">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item prop="cf">
+            <el-input
+              v-model="ruleForm.cfHandle"
+              clearable
+              placeholder="Codeforces 用户名"
+              :prefix-icon="useRenderIcon('tdesign:code')"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="atc">
+            <el-input
+              v-model="ruleForm.atcHandle"
+              clearable
+              placeholder="Atcoder 用户名"
+              :prefix-icon="useRenderIcon('tdesign:code')"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
     </Motion>
 
     <Motion :delay="200">

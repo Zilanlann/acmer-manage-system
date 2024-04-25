@@ -68,7 +68,16 @@ function onBack() {
     size="large"
   >
     <Motion :delay="100">
-      <el-form-item prop="email">
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '请输入邮箱',
+            trigger: 'blur'
+          }
+        ]"
+        prop="email"
+      >
         <el-input
           v-model="ruleForm.email"
           clearable
