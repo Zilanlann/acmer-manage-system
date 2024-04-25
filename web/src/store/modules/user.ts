@@ -4,8 +4,13 @@ import type { userType } from "./types";
 import { routerArrays } from "@/layout/types";
 import { router, resetRouter } from "@/router";
 import { storageLocal } from "@pureadmin/utils";
-import { getLogin, refreshTokenApi } from "@/api/user";
-import type { UserResult, RefreshTokenResult } from "@/api/user";
+import {
+  getLogin,
+  getRegister,
+  refreshTokenApi,
+  sendVerifyCode
+} from "@/api/user";
+import type { UserResult, RefreshTokenResult, BareResult } from "@/api/user";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
@@ -18,7 +23,7 @@ export const useUserStore = defineStore({
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
     // 页面级别权限
     roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
-    // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：二维码登录、3：注册、4：忘记密码）
+    // 判断登录页面显示哪个组件（0：登录（默认）、2：注册、3：忘记密码）
     currentPage: 0,
     // 是否勾选了登录页的免登录
     isRemembered: false,
@@ -59,6 +64,30 @@ export const useUserStore = defineStore({
               setToken(data.data);
               resolve(data);
             }
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    },
+    /** 发送验证码到邮箱 */
+    async sendCode(data) {
+      return new Promise<BareResult>((resolve, reject) => {
+        sendVerifyCode(data)
+          .then(data => {
+            resolve(data);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    },
+    /** 注册 */
+    async register(data) {
+      return new Promise<BareResult>((resolve, reject) => {
+        getRegister(data)
+          .then(data => {
+            resolve(data);
           })
           .catch(error => {
             reject(error);

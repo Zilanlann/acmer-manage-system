@@ -31,9 +31,28 @@ export type RefreshTokenResult = {
   };
 };
 
+export type BareResult = {
+  success: boolean;
+  code: number;
+  msg: string;
+};
+
 /** 登录 */
 export const getLogin = (data?: object) => {
   return http.request<UserResult>("post", baseUrlApi("login"), { data });
+};
+
+/** 发送验证码 */
+export const sendVerifyCode = (data?: object) => {
+  return http.request<BareResult>("post", baseUrlApi("verify-email"), {
+    data
+  });
+};
+
+export const getRegister = (data?: object) => {
+  return http.request<BareResult>("post", baseUrlApi("register"), {
+    data
+  });
 };
 
 /** 刷新token */

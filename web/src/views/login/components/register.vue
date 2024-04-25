@@ -2,7 +2,7 @@
 import { ref, reactive } from "vue";
 import Motion from "../utils/motion";
 import { message } from "@/utils/message";
-import { registerRules } from "../utils/rule";
+import { registerRules, REGEXP_MAIL } from "../utils/rule";
 import type { FormInstance } from "element-plus";
 // import { useVerifyCode } from "../utils/verifyCode";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -25,6 +25,7 @@ const ruleForm = reactive({
   atcHandle: ""
 });
 const ruleFormRef = ref<FormInstance>();
+const emailFormItemRef = ref<FormInstance>();
 const { isDisabled, text } = useVerifyCode();
 const repeatPasswordRule = [
   {
@@ -41,24 +42,61 @@ const repeatPasswordRule = [
   }
 ];
 
-const onUpdate = async (formEl: FormInstance | undefined) => {
+const onVerifyCode = async (email: string) => {
+  if (REGEXP_MAIL.test(email)) {
+    await useUserStoreHook()
+      .sendCode({ email: ruleForm.email })
+      .then(res => {
+        if (res.success) {
+          message("验证码已发送", { type: "success" });
+        }
+      })
+      .catch(error => {
+        message("验证码发送失败", { type: "error" });
+      });
+  }
+};
+
+const onRegister = async (formEl: FormInstance | undefined) => {
   loading.value = true;
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (checked.value) {
-        // 模拟请求，需根据实际开发进行修改
-        setTimeout(() => {
-          message("注册成功", {
-            type: "success"
+        useUserStoreHook()
+          .register({
+            username: ruleForm.username,
+            email: ruleForm.email,
+            code: ruleForm.verifyCode,
+            password: ruleForm.password,
+            realname: ruleForm.realname,
+            cfHandle: ruleForm.cfHandle,
+            atcHandle: ruleForm.atcHandle
+          })
+          .then(res => {
+            console.log(res);
+            if (res.success) {
+              message("注册成功", {
+                type: "success"
+              });
+            }
+            loading.value = false;
+          })
+          .catch(error => {
+            console.log(error);
+            if (error.response.data.code == 10011) {
+              message("验证码错误", {
+                type: "error"
+              });
+            } else {
+              message("注册失败", {
+                type: "error"
+              });
+            }
+            loading.value = false;
           });
-          loading.value = false;
-        }, 2000);
       } else {
         loading.value = false;
-        message("请勾选隐私政策", {
-          type: "warning"
-        });
       }
     } else {
       loading.value = false;
@@ -68,7 +106,6 @@ const onUpdate = async (formEl: FormInstance | undefined) => {
 };
 
 function onBack() {
-  // useVerifyCode().end();
   useUserStoreHook().SET_CURRENTPAGE(0);
 }
 </script>
@@ -129,6 +166,7 @@ function onBack() {
             trigger: 'blur'
           }
         ]"
+        ref="emailFormItemRef"
         prop="email"
       >
         <el-input
@@ -152,7 +190,7 @@ function onBack() {
           <el-button
             :disabled="isDisabled"
             class="ml-2"
-            @click="useVerifyCode().start(ruleFormRef, 'phone')"
+            @click="onVerifyCode(ruleForm.email)"
           >
             {{ text.length > 0 ? text + "秒后重新获取" : "获取验证码" }}
           </el-button>
@@ -216,7 +254,7 @@ function onBack() {
           size="default"
           type="primary"
           :loading="loading"
-          @click="onUpdate(ruleFormRef)"
+          @click="onRegister(ruleFormRef)"
         >
           确定
         </el-button>
