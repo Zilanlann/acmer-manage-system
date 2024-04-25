@@ -1,4 +1,5 @@
 import type { RouteRecordName } from "vue-router";
+import { Status } from "@/api/data";
 
 export type cacheType = {
   mode: string;
@@ -47,4 +48,8 @@ export type userType = {
 
 export type testType = {
   test?: string;
+};
+
+export type userStatusType = {
+  status?: Array<Status>;
 };

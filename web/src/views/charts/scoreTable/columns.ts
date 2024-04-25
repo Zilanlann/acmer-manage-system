@@ -1,8 +1,16 @@
-import { tableData } from "./data";
 import { clone, delay, useDark, useECharts } from "@pureadmin/utils";
 import { ref, computed, onMounted, reactive, watchEffect } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import { templateRef } from "@vueuse/core";
+import { useDataStoreHook } from "@/store/modules/data";
+
+async function getTableData() {
+  try {
+    await useDataStoreHook().getUserStatus();
+  } catch (error) {
+    console.error("Get table data failed", error);
+  }
+}
 
 export function useColumns() {
   const dataList = ref([]);
@@ -21,7 +29,7 @@ export function useColumns() {
     },
     {
       label: "姓名",
-      prop: "name",
+      prop: "realName",
       fixed: true,
       minWidth: 80
     },
@@ -131,18 +139,15 @@ export function useColumns() {
     pagination.align = paginationAlign.value as Align;
   });
 
-  onMounted(() => {
-    delay(600).then(() => {
-      const newList = [];
-      Array.from({ length: 6 }).forEach(() => {
-        newList.push(clone(tableData, true));
-      });
-      newList.flat(Infinity).forEach((item, index) => {
-        dataList.value.push({ id: index, ...item });
-      });
-      pagination.total = dataList.value.length;
-      loading.value = false;
+  onMounted(async () => {
+    const newList = [];
+    await getTableData();
+    newList.push(clone(useDataStoreHook().status, true));
+    newList.flat(Infinity).forEach((item, index) => {
+      dataList.value.push({ id: index, ...item });
     });
+    pagination.total = dataList.value.length;
+    loading.value = false;
   });
 
   return {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDataStoreHook } from "@/store/modules/data";
 import { useColumns } from "./columns";
 import smallPie from "@/views/charts/pieCharts/small/index.vue";
 import { ref, onMounted, onUnmounted } from "vue";
@@ -20,6 +21,8 @@ const {
 } = useColumns();
 
 const height = ref(document.body.clientHeight - 255);
+
+
 
 const updateHeight = () => {
   height.value = document.body.clientHeight - 255;
