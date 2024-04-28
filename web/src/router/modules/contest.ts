@@ -14,7 +14,8 @@ export default {
       name: "ContestManage",
       component: () => import("@/views/contest/index.vue"),
       meta: {
-        title: "比赛管理"
+        title: "比赛管理",
+        roles: ["admin", "teacher"]
       }
     }
   ]

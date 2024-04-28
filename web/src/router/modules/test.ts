@@ -14,7 +14,8 @@ export default {
       name: "TestPage",
       component: () => import("@/views/testPage/index.vue"),
       meta: {
-        title: "测试页面"
+        title: "测试页面",
+        roles: ["admin"]
       }
     }
   ]
