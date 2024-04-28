@@ -9,25 +9,20 @@ type User struct {
 	gorm.Model
 	Username  string `gorm:"size:255;not null;unique"`
 	RealName  string `gorm:"size:30"`
+	Email     string `gorm:"size:255;not null;unique"`
 	StudentID string `gorm:"size:30"`
 	Class     string `gorm:"size:30"`
+	CFHandle  string `gorm:"size:255"`
+	ATCHandle string `gorm:"size:255"`
 	Avatar    string `gorm:"size:255"`
 	Desc      string `gorm:"type:text"`
 	Password  string `gorm:"size:255;not null"`
 	Role      string `gorm:"size:30;not null"`
 }
 
-// AddUser adds a new user to the database with the given username and password.
-//
-// Parameters:
-// - username: the username of the user to be added.
-// - password: the password of the user to be added.
-//
-// Returns:
-// - error: an error if there was a problem adding the user to the database.
-func AddUser(username, password string) error {
-	hash := utils.BcryptHash(password)
-	return db.Create(&User{Username: username, Password: hash, Role: "acmer", Avatar: "https://userpic.codeforces.org/no-avatar.jpg"}).Error
+func AddUser(user User) error {
+	user.Password = utils.BcryptHash(user.Password)
+	return db.Create(&user).Error
 }
 
 func DeleteUser(id int) error {
@@ -58,6 +53,10 @@ func GetUserInfo(id int) (User, error) {
 	return user, err
 }
 
+func UpdateUser(user User) error {
+	return db.Save(&user).Error
+}
+
 func UpdateUserRole(id int, role string) error {
 	return db.Model(&User{}).Where("id = ?", id).Update("role", role).Error
 }
@@ -66,9 +65,9 @@ func UpdateUserAvatar(id int, avatar string) error {
 	return db.Model(&User{}).Where("id = ?", id).Update("avatar", avatar).Error
 }
 
-func GetAllUsers() ([]User, error) {
+func GetAllNormalUsers() ([]User, error) {
 	var users []User
-	err := db.Find(&users).Error
+	err := db.Model(&User{}).Where("role = ?", "acmer").Find(&users).Error
 	return users, err
 }
 

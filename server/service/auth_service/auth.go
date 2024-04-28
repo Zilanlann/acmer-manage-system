@@ -5,11 +5,15 @@ import (
 )
 
 type Auth struct {
-	UserId   int
-	Username string
-	Password string
-	Role     string
-	Avatar   string
+	UserId    int
+	Username  string
+	Password  string
+	Realname  string
+	Email     string
+	CfHandle  string
+	AtcHandle string
+	Role      string
+	Avatar    string
 }
 
 func (a *Auth) Check() (bool, error) {
@@ -29,7 +33,18 @@ func (a *Auth) Check() (bool, error) {
 }
 
 func (a *Auth) Add() error {
-	return model.AddUser(a.Username, a.Password)
+	u := model.User{
+		Username:  a.Username,
+		RealName:  a.Realname,
+		Password:  a.Password,
+		Email:     a.Email,
+		CFHandle:  a.CfHandle,
+		ATCHandle: a.AtcHandle,
+		Avatar:    a.Avatar,
+		Role:      "acmer",
+	}
+
+	return model.AddUser(u)
 }
 
 func (a *Auth) Delete() error {

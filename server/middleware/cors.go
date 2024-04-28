@@ -14,7 +14,7 @@ func CORS() func(c *gin.Context) {
   // - Credentials share
   // - Preflight requests cached for 12 hours
   return cors.New(cors.Config{
-    AllowOrigins:     []string{"https://acm.ycitoj.top"},
+    AllowOrigins:     []string{"https://acm.ycitoj.top", "http://localhost:8848", "http://localhost:4173"},
     AllowMethods:     []string{"PUT", "GET", "POST", "OPTIONS"},
     AllowHeaders:     []string{"origin", "content-type", "authorization", "x-requested-with"},
     ExposeHeaders:    []string{"Content-Length"},

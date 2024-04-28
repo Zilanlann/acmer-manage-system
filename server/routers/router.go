@@ -24,12 +24,17 @@ func InitRouter() *gin.Engine {
 	noAuth.POST("/login", api.Login)
 	noAuth.POST("/register", api.Register)
 	noAuth.POST("/refresh-token", api.RefreshToken)
+	noAuth.POST("/verify-email", api.SendVerifyCode)
 	
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
 		model.Casbin.AddPolicy("admin", "/api/v1/test", "GET")
 		apiv1.GET("/test", v1.Test)
+
+		model.Casbin.AddPolicy("acmer", "/api/v1/all-user-status", "GET")
+		model.Casbin.AddPolicy("admin", "/api/v1/all-user-status", "GET")
+		apiv1.GET("/all-user-status", v1.AllUserStatus)
 	}
 	return r
 }

@@ -54,8 +54,14 @@ type RatingChange struct {
 	NewRating               int    `json:"newRating" redis:"newRating"`
 }
 
-// GetUserInfo 通过 Codeforces API 获取用户信息
-func GetUserInfo(userHandle string) ([]User, error) {
+type byTimeDesc []RatingChange
+func (b byTimeDesc) Len() int           { return len(b) }
+func (b byTimeDesc) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b byTimeDesc) Less(i, j int) bool { return b[i].RatingUpdateTimeSeconds > b[j].RatingUpdateTimeSeconds }
+
+
+// apiGetUserInfo 通过 Codeforces API 获取用户信息
+func apiGetUserInfo(userHandle string) ([]User, error) {
 	url := fmt.Sprintf("https://codeforces.com/api/user.info?handles=%s&checkHistoricHandles=false", userHandle)
 
 	// 发送 HTTP GET 请求
@@ -81,9 +87,9 @@ func GetUserInfo(userHandle string) ([]User, error) {
 	return userInfo.Result, nil
 }
 
-// MGetUserInfo 通过 Codeforces API 获取多个用户信息
-func MGetUserInfo(userHandles []string) ([]User, error) {
-	// 将用户 handles 用逗号拼接成一个字符串
+// apiMGetUserInfo 通过 Codeforces API 获取多个用户信息
+func apiMGetUserInfo(userHandles []string) ([]User, error) {
+	// 将用户 handles 用分号拼接成一个字符串
 	handles := ""
 	for i, handle := range userHandles {
 		if i > 0 {
@@ -118,8 +124,8 @@ func MGetUserInfo(userHandles []string) ([]User, error) {
 	return userInfo.Result, nil
 }
 
-// GetUserRating 通过 Codeforces API 获取用户Rating历史
-func GetUserRating(userHandle string) ([]RatingChange, error) {
+// apiGetUserRating 通过 Codeforces API 获取用户Rating历史
+func apiGetUserRating(userHandle string) ([]RatingChange, error) {
 	url := fmt.Sprintf("https://codeforces.com/api/user.rating?handle=%s", userHandle)
 
 	// 发送 HTTP GET 请求

@@ -24,7 +24,6 @@ func init() {
 }
 
 func main() {
-	// cf.GetCurrentRatings([]string{"chrisann", "hufuai", "dayyun"})
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()

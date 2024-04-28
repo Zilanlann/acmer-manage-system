@@ -13,6 +13,7 @@ var MsgFlags = map[int]string{
 	INVALID_REFRESH_TOKEN: "RefreshToken无效",
 	USER_ALREADY_EXIST:    "用户已存在",
 	INVALID_PERMISSION:    "您没有操作权限",
+	INVALID_VERIFY_CODE:   "验证码错误",
 }
 
 func GetMsg(code int) string {

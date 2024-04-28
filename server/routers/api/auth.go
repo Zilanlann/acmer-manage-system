@@ -1,12 +1,20 @@
 package api
 
 import (
+	"fmt"
+	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/app"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/e"
+	"github.com/zilanlann/acmer-manage-system/server/pkg/mail"
+	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
 	"github.com/zilanlann/acmer-manage-system/server/service/auth_service"
+	"github.com/zilanlann/acmer-manage-system/server/service/cf_service"
 	"github.com/zilanlann/acmer-manage-system/server/utils"
 )
 
@@ -15,17 +23,20 @@ type auth struct {
 	Password string `json:"password" form:"password" binding:"required"`
 }
 
-//	@Summary		User login
-//	@Description	Authenticates a user and returns access and refresh tokens
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			auth	body		auth			true	"Login Credentials"
-//	@Success		200		{object}	app.Response	"Returns username, roles, accessToken, refreshToken, and token expiry"
-//	@Failure		400		{object}	app.Response	"Invalid Parameters"
-//	@Failure		401		{object}	app.Response	"Not Valid User"
-//	@Failure		500		{object}	app.Response	"Internal Server Error or Failed to Generate Token"
-//	@Router			/login [post]
+type register struct {
+	Username   string `json:"username" form:"username" binding:"required"`
+	Realname   string `json:"realname" form:"realname" binding:"required"`
+	Email      string `json:"email" form:"email" binding:"required"`
+	VerifyCode string `json:"code" form:"code" binding:"required"`
+	CfHandle   string `json:"cfHandle" form:"cfHandle"`
+	AtcHandle  string `json:"atcHandle" form:"atcHandle"`
+	Password   string `json:"password" form:"password" binding:"required"`
+}
+
+type verify struct {
+	Email string `json:"email" form:"email" binding:"required"`
+}
+
 func Login(c *gin.Context) {
 	appG := app.Gin{C: c}
 
@@ -63,29 +74,60 @@ func Login(c *gin.Context) {
 	})
 }
 
-//	@Summary		Register a new user
-//	@Description	creates a new user with the provided credentials
-//	@Tags			users
-//	@Accept			json
-//	@Produce		json
-//	@Param			auth	body		auth			true	"User Credentials"
-//	@Success		200		{object}	app.Response	"Successfully registered"
-//	@Failure		400		{object}	app.Response	"Invalid parameters"
-//	@Failure		500		{object}	app.Response	"Internal server error"
-//	@Router			/register [post]
 func Register(c *gin.Context) {
 	appG := app.Gin{C: c}
-
-	var a auth
+	var a register
 	if err := c.ShouldBind(&a); err != nil {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
-	authService := auth_service.Auth{Username: a.Username, Password: a.Password}
+	key := fmt.Sprintf("verify-code:%s", a.Email)
+	if redis.RDB.Exists(redis.Ctx, key).Val() == 0 {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_VERIFY_CODE, nil)
+		return
+	}
+	trueCode := redis.RDB.Get(redis.Ctx, key).Val()
+	if a.VerifyCode != trueCode {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_VERIFY_CODE, nil)
+		return
+	}
+	authService := auth_service.Auth{
+		Username: a.Username, Password: a.Password,
+		Realname: a.Realname, Email: a.Email, CfHandle: a.CfHandle, AtcHandle: a.AtcHandle,
+	}
+	if authService.CfHandle != "" {
+		authService.Avatar = cf_service.GetAvatar(a.CfHandle)
+	} else {
+		authService.Avatar = "https://userpic.codeforces.org/no-avatar.jpg"
+	}
 	err := authService.Add()
 	if err != nil {
+		log.Println(err)
 		appG.ErrorResponse(http.StatusInternalServerError, e.USER_ALREADY_EXIST, nil)
 		return
 	}
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
+}
+
+func SendVerifyCode(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	var a verify
+	if err := c.ShouldBind(&a); err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
+	key := fmt.Sprintf("verify-code:%s", a.Email)
+	if redis.RDB.Exists(redis.Ctx, key).Val() != 0 {
+		verifyCode := redis.RDB.Get(redis.Ctx, key).Val()
+		mail.SendCode(verifyCode, a.Email)
+	} else {
+		source := rand.NewSource(time.Now().UnixNano())
+		localRand := rand.New(source)
+		verifyCode := strconv.Itoa(localRand.Intn(900000) + 100000)
+		redis.RDB.Set(redis.Ctx, key, verifyCode, 5*time.Minute)
+		mail.SendCode(verifyCode, a.Email)
+	}
+
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
 }

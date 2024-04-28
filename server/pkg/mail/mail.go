@@ -38,7 +38,7 @@ func SendCode(code, email string) {
 	request.Subject = common.StringPtr("【YCIT AMS】邮箱绑定验证")
 
 	// 返回的resp是一个SendEmailResponse的实例，与请求对象对应
-	response, err := client.SendEmail(request)
+	_, err := client.SendEmail(request)
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
 		fmt.Printf("An API error has returned: %s", err)
 		return
@@ -47,5 +47,5 @@ func SendCode(code, email string) {
 		panic(err)
 	}
 	// 输出json格式的字符串回包
-	fmt.Printf("%s", response.ToJsonString())
+	// fmt.Printf("%s", response.ToJsonString())
 }
