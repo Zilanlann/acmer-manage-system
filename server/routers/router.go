@@ -13,7 +13,7 @@ import (
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
-	r.Use(gin.Logger())
+	r.Use(middleware.ZapLogger())
 	r.Use(middleware.CORS())
 	r.Use(gin.Recovery())
 	

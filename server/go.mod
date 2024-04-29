@@ -88,6 +88,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	go.uber.org/zap v1.27.0
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.21.0
 	golang.org/x/net v0.23.0 // indirect

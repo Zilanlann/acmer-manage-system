@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for ams-server on 2024-04-16T22:35:08+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'ams-server'
+primary_region = 'hkg'
+
+[build]
+
+[http_service]
+internal_port = 4230
+force_https = true
+auto_stop_machines = false
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
+
+[[vm]]
+size = 'shared-cpu-1x'

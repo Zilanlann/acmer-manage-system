@@ -10,10 +10,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
-	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
+	"github.com/zilanlann/acmer-manage-system/server/pkg/zap"
 	"github.com/zilanlann/acmer-manage-system/server/routers"
+	"github.com/zilanlann/acmer-manage-system/server/setting"
 	_ "go.uber.org/automaxprocs"
 )
 
@@ -21,6 +23,7 @@ func init() {
 	setting.Setup()
 	model.Setup()
 	redis.Setup()
+	global.LOG = zap.Zap() // 初始化zap日志库
 }
 
 func main() {

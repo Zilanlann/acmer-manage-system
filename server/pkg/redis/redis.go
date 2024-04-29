@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
+	"github.com/zilanlann/acmer-manage-system/server/setting"
 )
 
 var Ctx = context.Background()

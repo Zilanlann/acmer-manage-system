@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
+	"github.com/zilanlann/acmer-manage-system/server/setting"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

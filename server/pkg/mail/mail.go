@@ -7,7 +7,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	ses "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ses/v20201002"
-	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
+	"github.com/zilanlann/acmer-manage-system/server/setting"
 )
 
 func SendCode(code, email string) {

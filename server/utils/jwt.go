@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/zilanlann/acmer-manage-system/server/pkg/setting"
+	"github.com/zilanlann/acmer-manage-system/server/setting"
 )
 
 var jwtSecret = []byte(setting.JwtSetting.Secret)
