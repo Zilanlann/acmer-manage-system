@@ -2,8 +2,8 @@
 import { message } from "@/utils/message";
 import { useTestStoreHook } from "@/store/modules/test";
 import PieChartNormal from "@/views/charts/pieCharts/normal/index.vue";
-import Header from "@/views/contest/header/index.vue";
-import ContestTable from "@/views/contest/contestTable/index.vue";
+import Header from "@/views/user/manage/header/index.vue";
+import ContestTable from "@/views/user/manage/table/index.vue";
 import { reactive } from "vue";
 defineOptions({
   name: "ContestPage"
