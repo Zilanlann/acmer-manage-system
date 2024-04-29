@@ -36,3 +36,4 @@ tests/server/static/upload
 yarn-debug.log*
 yarn-error.log*
 server/docs
+server/log
