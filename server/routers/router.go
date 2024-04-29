@@ -6,9 +6,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/zilanlann/acmer-manage-system/server/docs"
 	"github.com/zilanlann/acmer-manage-system/server/middleware"
-	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/routers/api"
 	v1 "github.com/zilanlann/acmer-manage-system/server/routers/api/v1"
+	"github.com/zilanlann/acmer-manage-system/server/service/casbin_service"
 )
 
 func InitRouter() *gin.Engine {
@@ -29,12 +29,8 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
-		model.Casbin.AddPolicy("admin", "/api/v1/test", "GET")
-		apiv1.GET("/test", v1.Test)
-
-		model.Casbin.AddPolicy("acmer", "/api/v1/all-user-status", "GET")
-		model.Casbin.AddPolicy("admin", "/api/v1/all-user-status", "GET")
-		apiv1.GET("/all-user-status", v1.AllUserStatus)
+		casbin_service.AddRouterGet(apiv1, "/test", v1.Test, "admin")
+		casbin_service.AddRouterGet(apiv1, "/api/v1/all-user-status", v1.AllUserStatus, "admin", "acmer")
 	}
 	return r
 }

@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -15,5 +16,6 @@ var (
 	REDIS  redis.UniversalClient
 	VP     *viper.Viper
 	LOG    *zap.Logger
+	Casbin *casbin.Enforcer
 	lock   sync.RWMutex
 )
