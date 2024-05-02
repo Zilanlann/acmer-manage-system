@@ -13,7 +13,7 @@ import (
 
 var (
 	DB     *gorm.DB
-	REDIS  redis.UniversalClient
+	REDIS  *redis.Client
 	VP     *viper.Viper
 	LOG    *zap.Logger
 	Casbin *casbin.Enforcer

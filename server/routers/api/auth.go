@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/app"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/e"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/mail"
@@ -50,6 +51,7 @@ func Login(c *gin.Context) {
 
 	ok, err := authService.Check()
 	if err != nil {
+		global.LOG.Error(err.Error())
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_CHECK_FAIL, nil)
 		return
 	}
@@ -60,6 +62,7 @@ func Login(c *gin.Context) {
 
 	aToken, rToken, exTime, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
 	if err != nil {
+		global.LOG.Error(err.Error())
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_GEN_TOKEN, nil)
 		return
 	}
@@ -82,11 +85,11 @@ func Register(c *gin.Context) {
 		return
 	}
 	key := fmt.Sprintf("verify-code:%s", a.Email)
-	if redis.RDB.Exists(redis.Ctx, key).Val() == 0 {
+	if global.REDIS.Exists(redis.Ctx, key).Val() == 0 {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_VERIFY_CODE, nil)
 		return
 	}
-	trueCode := redis.RDB.Get(redis.Ctx, key).Val()
+	trueCode := global.REDIS.Get(redis.Ctx, key).Val()
 	if a.VerifyCode != trueCode {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_VERIFY_CODE, nil)
 		return
@@ -118,14 +121,14 @@ func SendVerifyCode(c *gin.Context) {
 		return
 	}
 	key := fmt.Sprintf("verify-code:%s", a.Email)
-	if redis.RDB.Exists(redis.Ctx, key).Val() != 0 {
-		verifyCode := redis.RDB.Get(redis.Ctx, key).Val()
+	if global.REDIS.Exists(redis.Ctx, key).Val() != 0 {
+		verifyCode := global.REDIS.Get(redis.Ctx, key).Val()
 		mail.SendCode(verifyCode, a.Email)
 	} else {
 		source := rand.NewSource(time.Now().UnixNano())
 		localRand := rand.New(source)
 		verifyCode := strconv.Itoa(localRand.Intn(900000) + 100000)
-		redis.RDB.Set(redis.Ctx, key, verifyCode, 5*time.Minute)
+		global.REDIS.Set(redis.Ctx, key, verifyCode, 5*time.Minute)
 		mail.SendCode(verifyCode, a.Email)
 	}
 

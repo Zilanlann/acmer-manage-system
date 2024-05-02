@@ -30,7 +30,13 @@ func InitRouter() *gin.Engine {
 	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
 		casbin_service.AddRouterGet(apiv1, "/test", v1.Test, "admin")
-		casbin_service.AddRouterGet(apiv1, "/api/v1/all-user-status", v1.AllUserStatus, "admin", "acmer")
+		casbin_service.AddRouterGet(apiv1, "/all-user-status", v1.AllUserStatus, "admin", "teacher", "acmer")
+		casbin_service.AddRouterGet(apiv1, "/users", v1.AllUsersList, "admin", "teacher")
+		casbin_service.AddRouterPut(apiv1, "/user", v1.AddUser, "admin", "teacher")
+		casbin_service.AddRouterDelete(apiv1, "/user/:id", v1.DeleteUser, "admin", "teacher")
+		casbin_service.AddRouterPut(apiv1, "/user/:id", v1.UpdateUser, "admin", "teacher")
+		casbin_service.AddRouterPut(apiv1, "/user/:id/role", v1.UpdateUserRole, "admin")
+		casbin_service.AddRouterPut(apiv1, "/user/:id/password", v1.UpdatePassword, "admin", "teacher")
 	}
 	return r
 }

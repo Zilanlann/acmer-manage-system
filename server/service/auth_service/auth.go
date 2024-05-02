@@ -46,11 +46,3 @@ func (a *Auth) Add() error {
 
 	return model.AddUser(u)
 }
-
-func (a *Auth) Delete() error {
-	return model.DeleteUser(a.UserId)
-}
-
-// func (a *Auth) Update() error {
-// 	return model.UpdateUser(a.UserId, a.Username, a.Role)
-// }

@@ -6,16 +6,16 @@ import (
 	"sort"
 	"time"
 
+	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
 )
-
 func GetWMRating(userHandle string) (weeklyAgo int, monthlyAgo int, err error) {
 	key := fmt.Sprintf("cf:rating:%s:*", userHandle)
-	keys, _, _ := redis.RDB.Scan(redis.Ctx, 0, key, 1000).Result()
+	keys, _, _ := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
 	ratingChanges := make([]RatingChange, 0, len(keys))
 	for _, key := range keys {
 		ratingChange := RatingChange{}
-		redis.RDB.HGetAll(redis.Ctx, key).Scan(&ratingChange)
+		global.REDIS.HGetAll(redis.Ctx, key).Scan(&ratingChange)
 		ratingChanges = append(ratingChanges, ratingChange)
 	}
 	sort.Sort(byTimeDesc(ratingChanges))
@@ -40,7 +40,7 @@ func GetWMRating(userHandle string) (weeklyAgo int, monthlyAgo int, err error) {
 
 func GetUserInfo(userHandle string) (user User, err error) {
 	key := fmt.Sprintf("cf:user:%s", userHandle)
-	err = redis.RDB.HGetAll(redis.Ctx, key).Scan(&user)
+	err = global.REDIS.HGetAll(redis.Ctx, key).Scan(&user)
 	return
 }
 
@@ -48,7 +48,7 @@ func GetUserInfos(userHandles []string) (users []User, err error) {
 	for _, userHandle := range userHandles {
 		key := fmt.Sprintf("cf:user:%s", userHandle)
 		user := User{}
-		err = redis.RDB.HGetAll(redis.Ctx, key).Scan(&user)
+		err = global.REDIS.HGetAll(redis.Ctx, key).Scan(&user)
 		users = append(users, user)
 	}
 	return
@@ -56,10 +56,10 @@ func GetUserInfos(userHandles []string) (users []User, err error) {
 
 func GetRatingChange(userHandle string) (ratingChange []RatingChange, err error) {
 	key := fmt.Sprintf("cf:rating:%s:*", userHandle)
-	keys, _, _ := redis.RDB.Scan(redis.Ctx, 0, key, 1000).Result()
+	keys, _, _ := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
 	for _, key := range keys {
 		tmpRatingChange := RatingChange{}
-		redis.RDB.HGetAll(redis.Ctx, key).Scan(&tmpRatingChange)
+		global.REDIS.HGetAll(redis.Ctx, key).Scan(&tmpRatingChange)
 		ratingChange = append(ratingChange, tmpRatingChange)
 	}
 	return
@@ -72,7 +72,7 @@ func RefreshRatingChange(userHandle string) error {
 	}
 	for _, ratingChange := range ratingChanges {
 		key := fmt.Sprintf("cf:rating:%s:%d", userHandle, ratingChange.ContestId)
-		redis.RDB.HSet(redis.Ctx, key, ratingChange)
+		global.REDIS.HSet(redis.Ctx, key, ratingChange)
 	}
 	return nil
 }
@@ -82,7 +82,7 @@ func RefreshUserInfos(userHandles []string) error {
 	queryUserHandles := make([]string, 0, 50)
 	for _, userHandle := range userHandles {
 		key := fmt.Sprintf("cf:user:%s", userHandle)
-		if num, _ := redis.RDB.Exists(redis.Ctx, key).Result(); num > 0 {
+		if num, _ := global.REDIS.Exists(redis.Ctx, key).Result(); num > 0 {
 			continue
 		}
 		queryUserHandles = append(queryUserHandles, userHandle)
@@ -101,7 +101,7 @@ func RefreshUserInfos(userHandles []string) error {
 
 func setUserInfo(userInfo User) error {
 	key := fmt.Sprintf("cf:user:%s", userInfo.Handle)
-	err := redis.RDB.HSet(redis.Ctx, key, userInfo).Err()
-	redis.RDB.Expire(redis.Ctx, key, 6*time.Hour)
+	err := global.REDIS.HSet(redis.Ctx, key, userInfo).Err()
+	global.REDIS.Expire(redis.Ctx, key, 6*time.Hour)
 	return err
 }

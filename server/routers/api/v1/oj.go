@@ -14,7 +14,7 @@ import (
 func AllUserStatus(c *gin.Context) {
 	appG := app.Gin{C: c}
 
-	users, _ := model.GetAllNormalUsers()
+	users, _ := model.GetACMersList()
 	queryUsers := []string{}
 	for _, user := range users {
 		queryUsers = append(queryUsers, user.CFHandle)
