@@ -74,7 +74,6 @@ const onRegister = async (formEl: FormInstance | undefined) => {
             atcHandle: ruleForm.atcHandle
           })
           .then(res => {
-            console.log(res);
             if (res.success) {
               message("注册成功", {
                 type: "success"
@@ -83,7 +82,6 @@ const onRegister = async (formEl: FormInstance | undefined) => {
             loading.value = false;
           })
           .catch(error => {
-            console.log(error);
             if (error.response.data.code == 10011) {
               message("验证码错误", {
                 type: "error"

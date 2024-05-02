@@ -3,7 +3,7 @@ export default {
   name: "Contest",
   redirect: "/contest",
   meta: {
-    icon: "tdesign:activity",
+    icon: "ep:medal",
     // showLink: false,
     title: "比赛管理",
     rank: 20
