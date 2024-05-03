@@ -12,7 +12,7 @@ export default {
     {
       path: "/contest",
       name: "ContestManage",
-      component: () => import("@/views/contest/index.vue"),
+      component: () => import("@/views/contest/manage/index.vue"),
       meta: {
         title: "比赛管理",
         roles: ["admin", "teacher"]

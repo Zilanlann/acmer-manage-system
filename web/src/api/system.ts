@@ -60,3 +60,8 @@ export const updateUserPassword = (id?: number, data?: object) => {
 export const deleteUser = (data?: object) => {
   return http.request<Result>("delete", v1BaseUrlApi("user/") + data, { data });
 };
+
+/** 系统管理-用户管理-删除多个用户 */
+export const deleteUsers = (data?: object) => {
+  return http.request<Result>("delete", v1BaseUrlApi("users"), { data });
+};

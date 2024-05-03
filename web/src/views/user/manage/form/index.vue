@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     cfHandle: "",
     atcHandle: "",
     studentID: "",
-    sex: true
+    sex: null
   })
 });
 
@@ -104,7 +104,7 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="性别">
+        <el-form-item label="性别" prop="sex">
           <el-select
             v-model="newFormInline.sex"
             placeholder="请选择用户性别"

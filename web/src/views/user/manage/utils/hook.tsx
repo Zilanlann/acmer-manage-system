@@ -23,7 +23,8 @@ import {
   deleteUser,
   updateUser,
   updateUserRole,
-  updateUserPassword
+  updateUserPassword,
+  deleteUsers
 } from "@/api/system";
 import {
   ElForm,
@@ -258,14 +259,31 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   /** 批量删除 */
   function onbatchDel() {
-    // 返回当前选中的行
+    // 返回当前-选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
-      type: "success"
-    });
-    tableRef.value.getTableRef().clearSelection();
-    onSearch();
+    async function handleBatchDel() {
+      const idList = getKeyList(curSelected, "ID");
+      const req = {
+        ids: idList
+      };
+      await deleteUsers(req)
+        .then(() => {
+          message(`已删除用户编号为 ${getKeyList(curSelected, "ID")} 的数据`, {
+            type: "success"
+          });
+          tableRef.value.getTableRef().clearSelection();
+          onSearch();
+        })
+        .catch(() => {
+          message(
+            `用户编号为 ${getKeyList(curSelected, "ID")} 的数据删除失败`,
+            {
+              type: "error"
+            }
+          );
+        });
+    }
+    handleBatchDel();
   }
 
   async function onSearch() {
