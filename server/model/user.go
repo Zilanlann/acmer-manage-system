@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/utils"
 	"gorm.io/gorm"
@@ -26,14 +24,12 @@ type User struct {
 }
 
 func AddUser(user User) error {
-	fmt.Printf("user.Password: %v\n", user.Password)
 	user.Password = utils.BcryptHash(user.Password)
-	fmt.Printf("user.Password: %v\n", user.Password)
-	return db.Create(&user).Error
+	return global.DB.Create(&user).Error
 }
 
 func DeleteUser(id uint) error {
-	return db.Where("id = ?", id).Delete(&User{}).Error
+	return global.DB.Where("id = ?", id).Delete(&User{}).Error
 }
 
 func CheckUser(username, password string) (id int, err error) {
@@ -41,7 +37,7 @@ func CheckUser(username, password string) (id int, err error) {
 		return 0, nil
 	}
 	var user User
-	err = db.Where("username = ?", username).First(&user).Error
+	err = global.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return 0, nil // 用户不存在
@@ -51,45 +47,44 @@ func CheckUser(username, password string) (id int, err error) {
 	if utils.BcryptCheck(password, user.Password) {
 		return int(user.ID), nil // 用户存在，密码正确
 	}
-	global.LOG.Warn("password is wrong")
 	return 0, nil
 }
 
 func GetUserInfo(id int) (User, error) {
 	var user User
-	err := db.Where("id = ?", id).First(&user).Error
+	err := global.DB.Where("id = ?", id).First(&user).Error
 	return user, err
 }
 
 func UpdateUser(user User) error {
-	return db.Select("username", "real_name", "email", "sex", "student_id", "class", "phone", "cf_handle", "atc_handle").Save(&user).Error
+	return global.DB.Select("username", "real_name", "email", "sex", "student_id", "class", "phone", "cf_handle", "atc_handle").Save(&user).Error
 }
 
 func UpdateUserRole(id uint, role string) error {
-	return db.Model(&User{}).Where("id = ?", id).Update("role", role).Error
+	return global.DB.Model(&User{}).Where("id = ?", id).Update("role", role).Error
 }
 
 func UpdateUserAvatar(id uint, avatar string) error {
-	return db.Model(&User{}).Where("id = ?", id).Update("avatar", avatar).Error
+	return global.DB.Model(&User{}).Where("id = ?", id).Update("avatar", avatar).Error
 }
 
 func UpdatePassword(id uint, password string) error {
-	return db.Model(&User{}).Where("id = ?", id).Update("password", utils.BcryptHash(password)).Error
+	return global.DB.Model(&User{}).Where("id = ?", id).Update("password", utils.BcryptHash(password)).Error
 }
 
 func GetACMersList() ([]User, error) {
 	var users []User
-	err := db.Model(&User{}).Where("role = ?", "acmer").Find(&users).Error
+	err := global.DB.Model(&User{}).Where("role = ?", "acmer").Find(&users).Error
 	return users, err
 }
 
 func GetAllUsersList() ([]User, error) {
 	var users []User
-	err := db.Model(&User{}).Find(&users).Error
+	err := global.DB.Model(&User{}).Find(&users).Error
 	return users, err
 }
 
 func AddAdmin() error {
 	hash := utils.BcryptHash("adminadmin123")
-	return db.Create(&User{Username: "admin", Password: hash, Avatar: "https://userpic.codeforces.org/no-avatar.jpg", Role: "admin"}).Error
+	return global.DB.Create(&User{Username: "admin", Password: hash, Avatar: "https://userpic.codeforces.org/no-avatar.jpg", Role: "admin"}).Error
 }

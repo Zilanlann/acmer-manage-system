@@ -90,6 +90,31 @@ func DeleteUser(c *gin.Context) {
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
 }
 
+func DeleteUsers(c *gin.Context) {
+	appG := app.Gin{C: c}
+	var user user_service.User
+
+	// 将字符串类型的 id 转换为 uint 类型
+	ids := struct{
+		Ids []uint `json:"ids" form:"ids" binding:"required"`
+	}{}
+    if err := c.ShouldBind(&ids); err != nil {
+        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+        return
+    }
+
+	for _, id := range ids.Ids {
+		user.ID = id
+		if err := user.Delete(); err != nil {
+			global.LOG.Error(err.Error())
+			appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_USER_DELETE_FAIL, nil)
+			return
+		}
+	}
+
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
+}
+
 func UpdateUserRole(c *gin.Context) {
 	appG := app.Gin{C: c}
 

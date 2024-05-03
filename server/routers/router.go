@@ -34,6 +34,7 @@ func InitRouter() *gin.Engine {
 		casbin_service.AddRouterGet(apiv1, "/users", v1.AllUsersList, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user", v1.AddUser, "admin", "teacher")
 		casbin_service.AddRouterDelete(apiv1, "/user/:id", v1.DeleteUser, "admin", "teacher")
+		casbin_service.AddRouterDelete(apiv1, "/users", v1.DeleteUsers, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user/:id", v1.UpdateUser, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user/:id/role", v1.UpdateUserRole, "admin")
 		casbin_service.AddRouterPut(apiv1, "/user/:id/password", v1.UpdatePassword, "admin", "teacher")
