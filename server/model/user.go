@@ -19,7 +19,7 @@ type User struct {
 	ATCHandle string `gorm:"size:255" json:"atcHandle"`
 	Avatar    string `gorm:"size:255" json:"avatar"`
 	Desc      string `gorm:"type:text" json:"desc"`
-	Password  string `gorm:"size:255;not null" json:"password"`
+	Password  string `gorm:"size:255;not null" json:"-"`
 	Role      string `gorm:"size:30;not null" json:"role"`
 }
 

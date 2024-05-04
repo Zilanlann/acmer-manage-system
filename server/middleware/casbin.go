@@ -21,7 +21,7 @@ func CheckPermission() func(c *gin.Context) {
 		if ok, _ := global.Casbin.Enforce(sub, obj, act); ok {
 			c.Next()
 		} else {
-			appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PERMISSION, nil)
+			appG.ErrorResponse(http.StatusBadRequest, e.UNAUTHORIZED, nil)
 			c.Abort()
 		}
 	}

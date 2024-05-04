@@ -16,7 +16,7 @@ func InitRouter() *gin.Engine {
 	r.Use(middleware.ZapLogger())
 	r.Use(middleware.CORS())
 	r.Use(gin.Recovery())
-	
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.StaticFile("/swagger.yaml", "./docs/swagger.yaml")
 
@@ -25,19 +25,24 @@ func InitRouter() *gin.Engine {
 	noAuth.POST("/register", api.Register)
 	noAuth.POST("/refresh-token", api.RefreshToken)
 	noAuth.POST("/verify-email", api.SendVerifyCode)
-	
+
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
 		casbin_service.AddRouterGet(apiv1, "/test", v1.Test, "admin")
+
+		// Api about user
 		casbin_service.AddRouterGet(apiv1, "/all-user-status", v1.AllUserStatus, "admin", "teacher", "acmer")
-		casbin_service.AddRouterGet(apiv1, "/users", v1.AllUsersList, "admin", "teacher")
+		casbin_service.AddRouterGet(apiv1, "/users", v1.AllUserList, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user", v1.AddUser, "admin", "teacher")
 		casbin_service.AddRouterDelete(apiv1, "/user/:id", v1.DeleteUser, "admin", "teacher")
 		casbin_service.AddRouterDelete(apiv1, "/users", v1.DeleteUsers, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user/:id", v1.UpdateUser, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/user/:id/role", v1.UpdateUserRole, "admin")
 		casbin_service.AddRouterPut(apiv1, "/user/:id/password", v1.UpdatePassword, "admin", "teacher")
+
+		// Api about contest
+		casbin_service.AddRouterGet(apiv1, "/contests", v1.AllContestList, "admin", "teacher")
 	}
 	return r
 }

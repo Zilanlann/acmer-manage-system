@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/setting"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -12,15 +13,13 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var db *gorm.DB
-
 func Setup() {
 	var err error
 
 	switch setting.DatabaseSetting.Type {
 	case "mysql":
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", setting.DatabaseSetting.User, setting.DatabaseSetting.Password, setting.DatabaseSetting.Host, setting.DatabaseSetting.Port, setting.DatabaseSetting.Name)
-		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 			NamingStrategy: schema.NamingStrategy{
 				TablePrefix:   setting.DatabaseSetting.TablePrefix, // table name prefix, table for `User` would be `t_users`
 				SingularTable: true,                                // use singular table name, table for `User` would be `user` with this option enabled
@@ -32,7 +31,7 @@ func Setup() {
 		}
 	case "postgres":
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require TimeZone=Asia/Shanghai", setting.DatabaseSetting.Host, setting.DatabaseSetting.User, setting.DatabaseSetting.Password, setting.DatabaseSetting.Name, setting.DatabaseSetting.Port)
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		global.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 			NamingStrategy: schema.NamingStrategy{
 				TablePrefix:   setting.DatabaseSetting.TablePrefix, // table name prefix, table for `User` would be `t_users`
 				SingularTable: true,                                // use singular table name, table for `User` would be `user` with this option enabled
@@ -44,14 +43,14 @@ func Setup() {
 		}
 	}
 
-	sqlDB, err := db.DB()
+	sqlDB, err := global.DB.DB()
 	if err != nil {
 		log.Println(err)
 	}
 	sqlDB.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenConns)
 
-	db.AutoMigrate(&User{})
+	global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{})
 	AddAdmin()
 
 	CasbinSetup()

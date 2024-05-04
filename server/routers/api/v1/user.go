@@ -11,16 +11,16 @@ import (
 	"github.com/zilanlann/acmer-manage-system/server/service/user_service"
 )
 
-func AllUsersList(c *gin.Context) {
+func AllUserList(c *gin.Context) {
 	appG := app.Gin{C: c}
 
 	userList := user_service.UserList{}
 	userList.Get()
 
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
-		"list": userList.Users,
-		"total": userList.Total,
-		"pageSize": 10,
+		"list":        userList.Users,
+		"total":       userList.Total,
+		"pageSize":    10,
 		"currentPage": 1,
 	})
 }
@@ -33,6 +33,13 @@ func AddUser(c *gin.Context) {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
+	password := struct {
+		Password string `json:"password" form:"password" binding:"required"`
+	}{}
+	if err := c.ShouldBind(&password); err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+	}
+	user.Password = password.Password
 
 	if err := user.Add(); err != nil {
 		global.LOG.Error(err.Error())
@@ -48,12 +55,12 @@ func UpdateUser(c *gin.Context) {
 
 	var user user_service.User
 	// 将字符串类型的 id 转换为 uint 类型
-    id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-        return
-    }
-    user.ID = uint(id)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
+	user.ID = uint(id)
 
 	if err := c.ShouldBind(&user); err != nil {
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
@@ -74,12 +81,12 @@ func DeleteUser(c *gin.Context) {
 	var user user_service.User
 
 	// 将字符串类型的 id 转换为 uint 类型
-    id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-        return
-    }
-    user.ID = uint(id)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
+	user.ID = uint(id)
 
 	if err := user.Delete(); err != nil {
 		global.LOG.Error(err.Error())
@@ -95,13 +102,13 @@ func DeleteUsers(c *gin.Context) {
 	var user user_service.User
 
 	// 将字符串类型的 id 转换为 uint 类型
-	ids := struct{
+	ids := struct {
 		Ids []uint `json:"ids" form:"ids" binding:"required"`
 	}{}
-    if err := c.ShouldBind(&ids); err != nil {
-        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-        return
-    }
+	if err := c.ShouldBind(&ids); err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
 
 	for _, id := range ids.Ids {
 		user.ID = id
@@ -120,12 +127,12 @@ func UpdateUserRole(c *gin.Context) {
 
 	var user user_service.User
 	// 将字符串类型的 id 转换为 uint 类型
-    id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-        return
-    }
-    user.ID = uint(id)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
+	user.ID = uint(id)
 
 	updateRole := struct {
 		Role string `json:"role" form:"role" binding:"required"`
@@ -151,11 +158,11 @@ func UpdatePassword(c *gin.Context) {
 	var user user_service.User
 	// 将字符串类型的 id 转换为 uint 类型
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-        appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
-        return
-    }
-    user.ID = uint(id)
+	if err != nil {
+		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
+	}
+	user.ID = uint(id)
 
 	updatePassword := struct {
 		Password string `json:"password" form:"password" binding:"required"`

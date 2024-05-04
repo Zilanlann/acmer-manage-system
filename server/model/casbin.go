@@ -9,7 +9,7 @@ import (
 
 
 func CasbinSetup() {
-	a, _ := gormadapter.NewAdapterByDB(db)
+	a, _ := gormadapter.NewAdapterByDB(global.DB)
 	global.Casbin, _ = casbin.NewEnforcer("./conf/model.conf", a)
 
 	global.Casbin.LoadPolicy()
