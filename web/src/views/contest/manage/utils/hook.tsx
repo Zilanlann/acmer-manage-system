@@ -23,8 +23,7 @@ import {
   deleteUser,
   updateUser,
   updateUserRole,
-  updateUserPassword,
-  deleteUsers
+  updateUserPassword
 } from "@/api/system";
 import {
   ElForm,
@@ -43,13 +42,16 @@ import {
   reactive,
   onMounted
 } from "vue";
+import { getContestList } from "@/api/contest";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
     username: "",
     phone: "",
-    realname: "",
-    grade: ""
+    contestName: "",
+    time: "",
+    startTime: "",
+    endTime: ""
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -69,85 +71,30 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   });
   const columns: TableColumnList = [
     {
-      label: "勾选列", // 如果需要表格多选，此处label必须设置
+      label: "勾选列",
       type: "selection",
       fixed: "left",
       reserveSelection: true // 数据刷新后保留选项
     },
     {
-      label: "用户编号",
+      type: "expand",
+      slot: "expand"
+    },
+    {
+      label: "比赛编号",
       prop: "ID",
       width: 90
     },
     {
-      label: "用户头像",
-      prop: "avatar",
-      cellRenderer: ({ row }) => (
-        <el-image
-          fit="cover"
-          preview-teleported={true}
-          src={row.avatar || userAvatar}
-          preview-src-list={Array.of(row.avatar || userAvatar)}
-          class="w-[24px] h-[24px] rounded-full align-middle"
-        />
-      ),
-      width: 90
-    },
-    {
-      label: "用户名称",
-      prop: "realname",
+      label: "比赛名称",
+      prop: "name",
       minWidth: 130
     },
     {
-      label: "用户昵称",
-      prop: "username",
-      minWidth: 130
-    },
-    {
-      label: "性别",
-      prop: "sex",
+      label: "比赛时间",
+      prop: "time",
       minWidth: 90,
-      sortable: true,
-      cellRenderer: ({ row, props }) => (
-        <el-tag
-          size={props.size}
-          type={row.sex === false ? "danger" : null}
-          effect="plain"
-        >
-          {row.sex === false ? "女" : "男"}
-        </el-tag>
-      )
-    },
-    {
-      label: "班级",
-      prop: "class",
-      minWidth: 130
-    },
-    {
-      label: "学号",
-      prop: "studentID",
-      minWidth: 130
-    },
-    {
-      label: "手机号码",
-      prop: "phone",
-      minWidth: 90
-      // formatter: ({ phone }) => hideTextAtIndex(phone, { start: 3, end: 6 })
-    },
-    {
-      label: "用户邮箱",
-      prop: "email",
-      minWidth: 180
-    },
-    {
-      label: "Codeforces",
-      prop: "cfHandle",
-      minWidth: 130
-    },
-    {
-      label: "Atcoder",
-      prop: "atcHandle",
-      minWidth: 130
+      sortable: true
     },
     {
       label: "创建时间",
@@ -163,6 +110,80 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       slot: "operation"
     }
   ];
+  const teamColumns: TableColumnList = [
+    {
+      label: "勾选列",
+      type: "selection",
+      fixed: "left",
+      reserveSelection: true // 数据刷新后保留选项
+    },
+    {
+      type: "expand",
+      slot: "expand"
+    },
+    {
+      label: "队伍编号",
+      prop: "ID",
+      width: 90
+    },
+    {
+      label: "队伍名称",
+      prop: "name",
+      minWidth: 130
+    },
+    {
+      label: "操作",
+      fixed: "right",
+      width: 180,
+      slot: "operation"
+    }
+  ];
+  const contestantColumns: TableColumnList = [
+    {
+      label: "勾选列",
+      type: "selection",
+      fixed: "left",
+      reserveSelection: true // 数据刷新后保留选项
+    },
+    {
+      label: "队员编号",
+      prop: "ID",
+      width: 90
+    },
+    {
+      label: "姓名",
+      prop: "user.realname",
+      minWidth: 130
+    },
+    {
+      label: "班级",
+      prop: "user.class",
+      minWidth: 130
+    },
+    {
+      label: "学号",
+      prop: "user.studentID",
+      minWidth: 130
+    },
+    {
+      label: "手机号码",
+      prop: "user.phone",
+      minWidth: 90
+      // formatter: ({ phone }) => hideTextAtIndex(phone, { start: 3, end: 6 })
+    },
+    {
+      label: "用户邮箱",
+      prop: "user.email",
+      minWidth: 180
+    },
+    {
+      label: "操作",
+      fixed: "right",
+      width: 180,
+      slot: "operation"
+    }
+  ];
+
   const buttonClass = computed(() => {
     return [
       "!h-[20px]",
@@ -260,40 +281,24 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   /** 批量删除 */
   function onbatchDel() {
-    // 返回当前-选中的行
+    // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    async function handleBatchDel() {
-      const idList = getKeyList(curSelected, "ID");
-      const req = {
-        ids: idList
-      };
-      await deleteUsers(req)
-        .then(() => {
-          message(`已删除用户编号为 ${getKeyList(curSelected, "ID")} 的数据`, {
-            type: "success"
-          });
-          tableRef.value.getTableRef().clearSelection();
-          onSearch();
-        })
-        .catch(() => {
-          message(
-            `用户编号为 ${getKeyList(curSelected, "ID")} 的数据删除失败`,
-            {
-              type: "error"
-            }
-          );
-        });
-    }
-    handleBatchDel();
+    console.log(curSelected);
+    // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
+    message(`已删除用户编号为 ${getKeyList(curSelected, "ID")} 的数据`, {
+      type: "success"
+    });
+    tableRef.value.getTableRef().clearSelection();
+    onSearch();
   }
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getUserList();
+    const { data } = await getContestList();
     const body = toRaw(form);
     let list = data.list;
-    list = list.filter(item => item.realname.includes(body?.realname));
-    if (body.phone) list = list.filter(item => item.phone === body.phone);
+    // list = list.filter(item => item.realname.includes(body?.contestName));
+    // if (body.phone) list = list.filter(item => item.phone === body.phone);
 
     dataList.value = list;
     pagination.total = data.total;
@@ -500,69 +505,17 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  /** 分配角色 */
-  async function handleRole(row) {
-    // 选中的角色列表
-    const id = "acmer";
-    addDialog({
-      title: `分配 ${row.username} 用户的角色`,
-      props: {
-        formInline: {
-          username: row?.username ?? "",
-          realname: row?.realname ?? "",
-          roleOptions: roleOptions.value ?? [],
-          id: row?.ID ?? -1,
-          role: row?.role ?? ""
-        }
-      },
-      width: "400px",
-      draggable: true,
-      fullscreen: deviceDetection(),
-      fullscreenIcon: true,
-      closeOnClickModal: false,
-      contentRenderer: () => h(roleForm),
-      beforeSure: (done, { options }) => {
-        const curData = options.props.formInline as RoleFormItemProps;
-        /** 修改用户角色 */
-        async function handleAddUser(data) {
-          await updateUserRole(data.id, data)
-            .then(res => {
-              chores();
-            })
-            .catch(err => {
-              message(`用户名称为${data.realname}的角色更改失败`, {
-                type: "error"
-              });
-            });
-        }
-        function chores() {
-          message(`用户名称为${curData.realname}的角色更改成功`, {
-            type: "success"
-          });
-          done(); // 关闭弹框
-          onSearch(); // 刷新表格数据
-        }
-        handleAddUser(curData);
-      }
-    });
-  }
-
   onMounted(async () => {
     treeLoading.value = true;
     onSearch();
-
-    // 角色列表
-    roleOptions.value = [
-      { id: "admin", name: "系统管理员" },
-      { id: "teacher", name: "教师" },
-      { id: "acmer", name: "ACMer" }
-    ];
   });
 
   return {
     form,
     loading,
     columns,
+    teamColumns,
+    contestantColumns,
     dataList,
     treeLoading,
     selectedNum,
@@ -576,7 +529,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     handleDelete,
     handleUpload,
     handleReset,
-    handleRole,
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,

@@ -22,8 +22,6 @@ const {
 
 const height = ref(document.body.clientHeight - 255);
 
-
-
 const updateHeight = () => {
   height.value = document.body.clientHeight - 255;
 };
@@ -52,8 +50,11 @@ onUnmounted(() => {
 
     <pure-table
       border
+      adaptive
+      :adaptiveConfig="{ offsetBottom: 108 }"
+      align-whole="center"
+      table-layout="auto"
       row-key="id"
-      alignWhole="center"
       showOverflowTooltip
       :size="tableSize as any"
       :loading="loading"
