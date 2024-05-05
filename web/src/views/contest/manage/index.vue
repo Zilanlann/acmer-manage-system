@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useUser } from "./utils/hook";
+import { useContest } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
@@ -34,13 +34,16 @@ const {
   resetForm,
   onbatchDel,
   openDialog,
-  handleDelete,
-  handleReset,
+  openTeamDialog,
+  openContestantDialog,
+  handleDeleteContest,
+  handleDeleteTeam,
+  handleDeleteContestant,
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
   handleSelectionChange
-} = useUser(tableRef, treeRef);
+} = useContest(tableRef, treeRef);
 </script>
 
 <template>
@@ -119,9 +122,10 @@ const {
               </template>
             </el-popconfirm>
           </div>
+          <!-- 比赛表格 -->
           <pure-table
             ref="tableRef"
-            row-key="id"
+            row-key="ID"
             adaptive
             :adaptiveConfig="{ offsetBottom: 108 }"
             align-whole="center"
@@ -142,9 +146,13 @@ const {
           >
             <template #expand="{ row }">
               <div>
+                <div style="margin-left: 20px">
+                  <p>比赛详情以及备忘信息：</p>
+                  <p>{{ row.desc }}</p>
+                </div>
+                <!-- 队伍表格 -->
                 <PureTable
-                  adaptive
-                  :adaptiveConfig="{ offsetBottom: 108 }"
+                  row-key="ID"
                   align-whole="center"
                   table-layout="auto"
                   :columns="teamColumns"
@@ -152,14 +160,19 @@ const {
                 >
                   <template #expand="{ row }">
                     <div>
+                      <div style="margin-left: 20px">
+                        <p>队伍详情以及备忘信息：</p>
+                        <p>{{ row.desc }}</p>
+                      </div>
+                      <!-- 队员表格 -->
                       <PureTable
-                        adaptive
-                        :adaptiveConfig="{ offsetBottom: 108 }"
+                        row-key="ID"
                         align-whole="center"
                         table-layout="auto"
                         :columns="contestantColumns"
                         :data="row.contestants"
                       >
+                        <!-- 自定义操作 -->
                         <template #operation="{ row }">
                           <el-button
                             class="reset-margin"
@@ -167,13 +180,13 @@ const {
                             type="primary"
                             :size="size"
                             :icon="useRenderIcon(EditPen)"
-                            @click="openDialog('修改', row)"
+                            @click="openContestantDialog('修改', row)"
                           >
                             修改
                           </el-button>
                           <el-popconfirm
                             :title="`是否确认删除队员编号为${row.ID}的这名队员`"
-                            @confirm="handleDelete(row)"
+                            @confirm="handleDeleteContestant(row)"
                           >
                             <template #reference>
                               <el-button
@@ -198,13 +211,23 @@ const {
                       type="primary"
                       :size="size"
                       :icon="useRenderIcon(EditPen)"
-                      @click="openDialog('修改', row)"
+                      @click="openTeamDialog('修改', row)"
                     >
                       修改
                     </el-button>
+                    <el-button
+                      class="reset-margin"
+                      link
+                      type="primary"
+                      :size="size"
+                      :icon="useRenderIcon(AddFill)"
+                      @click="openContestantDialog('新增', row)"
+                    >
+                      添加队员
+                    </el-button>
                     <el-popconfirm
-                      :title="`是否确认删除比赛编号为${row.ID}的这条数据`"
-                      @confirm="handleDelete(row)"
+                      :title="`是否确认删除队伍编号为${row.ID}的这条数据`"
+                      @confirm="handleDeleteTeam(row)"
                     >
                       <template #reference>
                         <el-button
@@ -233,9 +256,19 @@ const {
               >
                 修改
               </el-button>
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
+                :icon="useRenderIcon(AddFill)"
+                @click="openTeamDialog('新增', row)"
+              >
+                添加队伍
+              </el-button>
               <el-popconfirm
                 :title="`是否确认删除比赛编号为${row.ID}的这条数据`"
-                @confirm="handleDelete(row)"
+                @confirm="handleDeleteContest(row)"
               >
                 <template #reference>
                   <el-button
@@ -257,22 +290,6 @@ const {
                   :size="size"
                   :icon="useRenderIcon(More)"
                 />
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
-                        :icon="useRenderIcon(Password)"
-                        @click="handleReset(row)"
-                      >
-                        重置密码
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
               </el-dropdown>
             </template>
           </pure-table>

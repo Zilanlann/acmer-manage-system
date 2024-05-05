@@ -1,28 +1,27 @@
 import "./reset.css";
 import dayjs from "dayjs";
-import roleForm from "../form/role.vue";
+import relativeTime from "dayjs/plugin/relativeTime";
+import duration from "dayjs/plugin/duration";
+import "dayjs/locale/zh-cn";
 import editForm from "../form/index.vue";
+import teamForm from "../form/team.vue";
+import contestantForm from "../form/contestant.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
-import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import croppingUpload from "../upload.vue";
 import userAvatar from "@/assets/user.jpg";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import type { FormItemProps, RoleFormItemProps } from "../utils/types";
+import type {
+  ContestantFormItemProps,
+  FormItemProps,
+  TeamFormItemProps
+} from "../utils/types";
+import { getKeyList, isAllEmpty, deviceDetection } from "@pureadmin/utils";
 import {
-  getKeyList,
-  isAllEmpty,
-  hideTextAtIndex,
-  deviceDetection
-} from "@pureadmin/utils";
-import {
-  getUserList,
-  addUser,
-  deleteUser,
+  getACMerList,
+  getTeachersList,
   updateUser,
-  updateUserRole,
   updateUserPassword
 } from "@/api/system";
 import {
@@ -42,16 +41,24 @@ import {
   reactive,
   onMounted
 } from "vue";
-import { getContestList } from "@/api/contest";
+import {
+  createContest,
+  createContestant,
+  createTeam,
+  deleteContest,
+  deleteContestant,
+  deleteTeam,
+  getContestList,
+  updateContest,
+  updateContestant,
+  updateTeam
+} from "@/api/contest";
 
-export function useUser(tableRef: Ref, treeRef: Ref) {
+export function useContest(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
     username: "",
-    phone: "",
     contestName: "",
-    time: "",
-    startTime: "",
-    endTime: ""
+    time: ""
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -91,10 +98,26 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       minWidth: 130
     },
     {
-      label: "比赛时间",
-      prop: "time",
+      label: "正式赛开始时间",
+      prop: "startTime",
       minWidth: 90,
-      sortable: true
+      sortable: true,
+      formatter: ({ startTime }) =>
+        dayjs(startTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "正式赛结束时间",
+      prop: "endTime",
+      minWidth: 90,
+      sortable: true,
+      formatter: ({ endTime }) => dayjs(endTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "比赛持续时长",
+      prop: "length",
+      minWidth: 90,
+      formatter: ({ startTime, endTime }) =>
+        dayjs.duration(dayjs(endTime).diff(dayjs(startTime))).format("HH:mm:ss")
     },
     {
       label: "创建时间",
@@ -106,7 +129,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "操作",
       fixed: "right",
-      width: 180,
+      width: 260,
       slot: "operation"
     }
   ];
@@ -127,14 +150,19 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 90
     },
     {
-      label: "队伍名称",
-      prop: "name",
+      label: "队伍中文名",
+      prop: "zhName",
+      minWidth: 130
+    },
+    {
+      label: "队伍英文名",
+      prop: "enName",
       minWidth: 130
     },
     {
       label: "操作",
       fixed: "right",
-      width: 180,
+      width: 230,
       slot: "operation"
     }
   ];
@@ -207,6 +235,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   // 当前密码强度（0-4）
   const curScore = ref();
   const roleOptions = ref([]);
+  const teacherOptions = ref([]);
+  const acmerOptions = ref([]);
 
   function onChange({ row, index }) {
     ElMessageBox.confirm(
@@ -250,9 +280,23 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       });
   }
 
-  async function handleDelete(row) {
-    await deleteUser(row.ID).then(() => {
-      message(`您删除了用户编号为${row.ID}的这条数据`, { type: "success" });
+  async function handleDeleteContest(row) {
+    await deleteContest(row.ID).then(() => {
+      message(`您删除了比赛编号为${row.ID}的这条数据`, { type: "success" });
+    });
+    onSearch();
+  }
+
+  async function handleDeleteTeam(row) {
+    await deleteTeam(row.ID).then(() => {
+      message(`您删除了队伍编号为${row.ID}的这条数据`, { type: "success" });
+    });
+    onSearch();
+  }
+
+  async function handleDeleteContestant(row) {
+    await deleteContestant(row.ID).then(() => {
+      message(`您删除了选手编号为${row.ID}的这条数据`, { type: "success" });
     });
     onSearch();
   }
@@ -280,7 +324,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   /** 批量删除 */
-  function onbatchDel() {
+  function onbatchDelContest() {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     console.log(curSelected);
@@ -297,7 +341,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     const { data } = await getContestList();
     const body = toRaw(form);
     let list = data.list;
-    // list = list.filter(item => item.realname.includes(body?.contestName));
+    list = list.filter(item => item.name.includes(body?.contestName));
     // if (body.phone) list = list.filter(item => item.phone === body.phone);
 
     dataList.value = list;
@@ -317,20 +361,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   function openDialog(title?: string, row?: FormItemProps) {
     addDialog({
-      title: `${title}用户`,
+      title: `${title}比赛`,
       props: {
         formInline: {
           title,
-          realname: row?.realname ?? "",
-          username: row?.username ?? "",
-          password: row?.password ?? "",
-          phone: row?.phone ?? "",
-          email: row?.email ?? "",
-          sex: row?.sex ?? "",
-          class: row?.class ?? "",
-          studentID: row?.studentID ?? "",
-          cfHandle: row?.cfHandle ?? "",
-          atcHandle: row?.atcHandle ?? ""
+          name: row?.name ?? "",
+          time: row?.time ?? "",
+          startTime: row?.startTime ?? "",
+          endTime: row?.endTime ?? "",
+          desc: row?.desc ?? ""
         }
       },
       width: "46%",
@@ -342,35 +381,111 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        /** 添加用户 */
-        async function handleAddUser(data) {
-          await addUser(data)
+        /** 添加比赛 */
+        async function handleCreateContest(data) {
+          await createContest(data)
             .then(res => {
               chores();
             })
             .catch(err => {
-              message(`用户名称为${curData.username}的这条数据${title}失败`, {
+              message(`比赛名称为${curData.name}的这条数据${title}失败`, {
                 type: "error"
               });
             });
         }
-        /** 更新用户 */
-        async function handleUpdateUser(data) {
-          // console.log(data);
+        /** 更新比赛 */
+        async function handleUpdateContest(data) {
           const id = row?.ID;
-          console.log(row);
-          await updateUser(id, data)
+          await updateContest(id, data)
             .then(() => {
               chores();
             })
             .catch(err => {
-              message(`用户名称为${curData.username}的这条数据${title}失败`, {
+              message(`比赛名称为${curData.name}的这条数据${title}失败`, {
                 type: "error"
               });
             });
         }
         function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
+          message(`您${title}了比赛名称为${curData.name}的这条数据`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+        FormRef.validate(valid => {
+          if (valid) {
+            // 表单规则校验通过
+            curData.startTime = dayjs(curData.time[0]).format(
+              "YYYY-MM-DDTHH:mm:ssZ"
+            );
+            curData.endTime = dayjs(curData.time[1]).format(
+              "YYYY-MM-DDTHH:mm:ssZ"
+            );
+            const { time, ...cleanedData } = curData;
+            if (title === "新增") {
+              handleCreateContest(cleanedData);
+            } else {
+              handleUpdateContest(cleanedData);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /** 打开队伍添加/修改弹框 */
+  function openTeamDialog(title?: string, row?: TeamFormItemProps) {
+    addDialog({
+      title: `${title}队伍`,
+      props: {
+        formInline: {
+          title,
+          contestID: row?.ID ?? 0,
+          zhName: row?.zhName ?? "",
+          enName: row?.enName ?? "",
+          teacherOptions: teacherOptions.value,
+          coachID: teacherOptions.value[0]?.ID ?? 0,
+          desc: row?.desc ?? ""
+        }
+      },
+      width: "46%",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(teamForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRef.value.getRef();
+        const curData = options.props.formInline as TeamFormItemProps;
+        const { teacherOptions, ...cleanedData } = curData;
+        /** 添加队伍 */
+        async function handleCreateTeam(data) {
+          await createTeam(data)
+            .then(res => {
+              chores();
+            })
+            .catch(err => {
+              message(`队伍名称为${curData.zhName}的这条数据${title}失败`, {
+                type: "error"
+              });
+            });
+        }
+        /** 更新队伍 */
+        async function handleUpdateTeam(data) {
+          const id = row?.ID;
+          await updateTeam(id, data)
+            .then(() => {
+              chores();
+            })
+            .catch(err => {
+              message(`队伍名称为${curData.zhName}的这条数据${title}失败`, {
+                type: "error"
+              });
+            });
+        }
+        function chores() {
+          message(`您${title}了队伍名称为${curData.zhName}的这条数据`, {
             type: "success"
           });
           done(); // 关闭弹框
@@ -380,9 +495,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           if (valid) {
             // 表单规则校验通过
             if (title === "新增") {
-              handleAddUser(curData);
+              handleCreateTeam(cleanedData);
             } else {
-              handleUpdateUser(curData);
+              handleUpdateTeam(cleanedData);
             }
           }
         });
@@ -390,28 +505,71 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  const cropRef = ref();
-  /** 上传头像 */
-  function handleUpload(row) {
+  /** 打开选手添加/修改弹框 */
+  function openContestantDialog(title?: string, row?: ContestantFormItemProps) {
     addDialog({
-      title: "裁剪、上传头像",
-      width: "40%",
-      draggable: true,
-      closeOnClickModal: false,
-      fullscreen: deviceDetection(),
-      contentRenderer: () =>
-        h(croppingUpload, {
-          ref: cropRef,
-          imgSrc: row.avatar || userAvatar,
-          onCropper: info => (avatarInfo.value = info)
-        }),
-      beforeSure: done => {
-        console.log("裁剪后的图片信息：", avatarInfo.value);
-        // 根据实际业务使用avatarInfo.value和row里的某些字段去调用上传头像接口即可
-        done(); // 关闭弹框
-        onSearch(); // 刷新表格数据
+      title: `${title}选手`,
+      props: {
+        formInline: {
+          title,
+          teamID: row?.ID ?? 0,
+          acmerOptions: acmerOptions.value,
+          userID: acmerOptions.value[0]?.ID ?? 0
+        }
       },
-      closeCallBack: () => cropRef.value.hidePopover()
+      width: "46%",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(contestantForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRef.value.getRef();
+        const curData = options.props.formInline as ContestantFormItemProps;
+        /** 添加选手 */
+        async function handleCreateContestant(data) {
+          await createContestant(data)
+            .then(res => {
+              chores();
+            })
+            .catch(err => {
+              message(`选手ID为${curData.userID}的这条数据${title}失败`, {
+                type: "error"
+              });
+            });
+        }
+        /** 更新选手 */
+        async function handleUpdateContestant(data) {
+          const id = row?.ID;
+          await updateContestant(id, data)
+            .then(() => {
+              chores();
+            })
+            .catch(err => {
+              message(`队伍名称为${curData.userID}的这条数据${title}失败`, {
+                type: "error"
+              });
+            });
+        }
+        function chores() {
+          message(`您${title}了队伍名称为${curData.userID}的这条数据`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+        FormRef.validate(valid => {
+          if (valid) {
+            // 表单规则校验通过
+            const { acmerOptions, ...cleanedData } = curData;
+            if (title === "新增") {
+              handleCreateContestant(cleanedData);
+            } else {
+              handleUpdateContestant(cleanedData);
+            }
+          }
+        });
+      }
     });
   }
 
@@ -421,93 +579,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       (curScore.value = isAllEmpty(newPwd) ? -1 : zxcvbn(newPwd).score)
   );
 
-  /** 重置密码 */
-  function handleReset(row) {
-    addDialog({
-      title: `重置 ${row.username} 用户的密码`,
-      width: "30%",
-      draggable: true,
-      closeOnClickModal: false,
-      fullscreen: deviceDetection(),
-      contentRenderer: () => (
-        <>
-          <ElForm ref={ruleFormRef} model={pwdForm}>
-            <ElFormItem
-              prop="password"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入新密码",
-                  trigger: "blur"
-                }
-              ]}
-            >
-              <ElInput
-                clearable
-                show-password
-                type="password"
-                v-model={pwdForm.password}
-                placeholder="请输入新密码"
-              />
-            </ElFormItem>
-          </ElForm>
-          <div class="mt-4 flex">
-            {pwdProgress.map(({ color, text }, idx) => (
-              <div
-                class="w-[19vw]"
-                style={{ marginLeft: idx !== 0 ? "4px" : 0 }}
-              >
-                <ElProgress
-                  striped
-                  striped-flow
-                  duration={curScore.value === idx ? 6 : 0}
-                  percentage={curScore.value >= idx ? 100 : 0}
-                  color={color}
-                  stroke-width={10}
-                  show-text={false}
-                />
-                <p
-                  class="text-center"
-                  style={{ color: curScore.value === idx ? color : "" }}
-                >
-                  {text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </>
-      ),
-      closeCallBack: () => (pwdForm.password = ""),
-      beforeSure: done => {
-        ruleFormRef.value.validate(valid => {
-          if (valid) {
-            // 表单规则校验通过
-            async function handleUpdatePassword(data) {
-              await updateUserPassword(data.id, data)
-                .then(() => {
-                  done(); // 关闭弹框
-                  message(`已成功重置 ${row.realname} 用户的密码`, {
-                    type: "success"
-                  });
-                  onSearch(); // 刷新表格数据
-                })
-                .catch(() => {
-                  message(`${row.realname} 用户的密码重置失败`, {
-                    type: "error"
-                  });
-                });
-            }
-            const data = { id: row.ID, password: pwdForm.password };
-            handleUpdatePassword(data);
-          }
-        });
-      }
-    });
-  }
-
   onMounted(async () => {
     treeLoading.value = true;
+    dayjs.extend(relativeTime);
+    dayjs.extend(duration);
     onSearch();
+    teacherOptions.value = (await getTeachersList()).data.list;
+    acmerOptions.value = (await getACMerList()).data.list;
+    console.log(teacherOptions.value);
   });
 
   return {
@@ -524,11 +603,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     deviceDetection,
     onSearch,
     resetForm,
-    onbatchDel,
+    onbatchDel: onbatchDelContest,
     openDialog,
-    handleDelete,
-    handleUpload,
-    handleReset,
+    openTeamDialog,
+    openContestantDialog,
+    handleDeleteContest,
+    handleDeleteTeam,
+    handleDeleteContestant,
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,

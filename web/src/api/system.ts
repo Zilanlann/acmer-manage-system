@@ -22,6 +22,14 @@ type ResultTable = {
   };
 };
 
+type ResultList = {
+  success: boolean;
+  data?: {
+    /** 列表数据 */
+    list: Array<any>;
+  };
+};
+
 /** 获取系统管理-用户管理列表 */
 export const getUserList = () => {
   return http.request<ResultTable>("get", v1BaseUrlApi("users"));
@@ -64,4 +72,14 @@ export const deleteUser = (data?: object) => {
 /** 系统管理-用户管理-删除多个用户 */
 export const deleteUsers = (data?: object) => {
   return http.request<Result>("delete", v1BaseUrlApi("users"), { data });
+};
+
+/** 获取教师列表 */
+export const getTeachersList = () => {
+  return http.request<ResultList>("get", v1BaseUrlApi("teachers"));
+};
+
+/** 获取ACMer列表 */
+export const getACMerList = () => {
+  return http.request<ResultList>("get", v1BaseUrlApi("acmers"));
 };

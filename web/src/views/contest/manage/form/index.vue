@@ -8,29 +8,14 @@ import { usePublicHooks } from "../../hooks";
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     title: "新增",
-    realname: "",
-    username: "",
-    password: "",
-    phone: "",
-    email: "",
-    class: "",
-    cfHandle: "",
-    atcHandle: "",
-    studentID: "",
-    sex: true
+    name: "",
+    startTime: "",
+    endTime: "",
+    time: "",
+    desc: ""
   })
 });
 
-const sexOptions = [
-  {
-    value: true,
-    label: "男"
-  },
-  {
-    value: false,
-    label: "女"
-  }
-];
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
 const newFormInline = ref(props.formInline);
@@ -51,108 +36,35 @@ defineExpose({ getRef });
   >
     <el-row :gutter="30">
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="用户昵称" prop="username">
+        <el-form-item label="比赛名称" prop="name">
           <el-input
-            v-model="newFormInline.username"
+            v-model="newFormInline.name"
             clearable
-            placeholder="请输入用户昵称"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="用户名称" prop="realname">
-          <el-input
-            v-model="newFormInline.realname"
-            clearable
-            placeholder="请输入用户名称"
-          />
-        </el-form-item>
-      </re-col>
-
-      <re-col
-        v-if="newFormInline.title === '新增'"
-        :value="12"
-        :xs="24"
-        :sm="24"
-      >
-        <el-form-item label="用户密码" prop="password">
-          <el-input
-            v-model="newFormInline.password"
-            clearable
-            show-password
-            placeholder="请输入用户密码"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="手机号" prop="phone">
-          <el-input
-            v-model="newFormInline.phone"
-            clearable
-            placeholder="请输入手机号"
+            placeholder="请输入比赛名称"
           />
         </el-form-item>
       </re-col>
 
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="邮箱" prop="email">
-          <el-input
-            v-model="newFormInline.email"
-            clearable
-            placeholder="请输入邮箱"
+        <el-form-item label="正式赛时间" prop="time">
+          <el-date-picker
+            v-model="newFormInline.time"
+            type="datetimerange"
+            range-separator="到"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
           />
         </el-form-item>
       </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="性别">
-          <el-select
-            v-model="newFormInline.sex"
-            placeholder="请选择用户性别"
-            class="w-full"
-            clearable
-          >
-            <el-option
-              v-for="(item, index) in sexOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="班级" prop="class">
+    </el-row>
+    <el-row :gutter="30">
+      <re-col :value="24" :xs="24" :sm="24">
+        <el-form-item label="比赛详情" prop="desc">
           <el-input
-            v-model="newFormInline.class"
-            clearable
-            placeholder="请输入班级"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="学号" prop="studentID">
-          <el-input
-            v-model="newFormInline.studentID"
-            clearable
-            placeholder="请输入学号"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="CF用户名" prop="cfHandle">
-          <el-input
-            v-model="newFormInline.cfHandle"
-            clearable
-            placeholder="请输入Codeforces用户名"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="ATC用户名" prop="atcHandle">
-          <el-input
-            v-model="newFormInline.atcHandle"
-            clearable
-            placeholder="请输入Atcoder用户名"
+            v-model="newFormInline.desc"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder="请输入比赛详情, 如: 比赛地点、报名网址、队伍数量、热身赛时间等"
           />
         </el-form-item>
       </re-col>
