@@ -1,43 +1,74 @@
 package model
 
 import (
+	"time"
+
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Contest struct {
 	gorm.Model
-	Name  string `gorm:"not null;unique" json:"name"`
-	Desc  string `gorm:"type:text" json:"desc"`
-	Teams []Team `json:"teams"`
+	Name      string    `gorm:"not null;unique" json:"name"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+	Desc      string    `gorm:"type:text" json:"desc"`
+	Teams     []Team    `json:"teams"`
 }
 
 type Team struct {
 	gorm.Model
 	ContestID   uint
-	Name        string       `gorm:"not null;unique" json:"name"`
-	CoachID     uint         `gorm:"foreignKey:UserID" json:"coach_id"`
+	ZhName      string       `gorm:"not null;unique" json:"zhName"`
+	EnName      string       `json:"enName"`
+	CoachID     uint         `gorm:"foreignKey:UserID" json:"coachID"`
 	Coach       User         `json:"coach"`
 	Contestants []Contestant `json:"contestants"`
+	Desc        string       `gorm:"type:text" json:"desc"`
 }
 
 type Contestant struct {
 	gorm.Model
-	TeamID uint
-	UserID uint
+	TeamID uint `gorm:"not null" json:"teamID"`
+	UserID uint `gorm:"not null" json:"userID"`
 	User   User `json:"user"`
 }
 
 func CreateContest(contest *Contest) error {
-	return global.DB.Create(contest).Error
+	return global.DB.Create(&contest).Error
 }
 
-func CreateTeam(contest *Contest, team *Team) error {
-	return global.DB.Create(team).Error
+func UpdateContest(contest *Contest) error {
+	return global.DB.Updates(&contest).Error
 }
 
-func CreateContestant(team *Team, contestant *Contestant) error {
-	return global.DB.Create(contestant).Error
+func DeleteContest(id uint) error {
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Contest{}).Error
+}
+
+func CreateTeam(team *Team) error {
+	return global.DB.Create(&team).Error
+}
+
+func UpdateTeam(team *Team) error {
+	return global.DB.Updates(&team).Error
+}
+
+func DeleteTeam(id uint) error {
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Team{}).Error
+}
+
+func CreateContestant(contestant *Contestant) error {
+	return global.DB.Create(&contestant).Error
+}
+
+func UpdateContestant(contestant *Contestant) error {
+	return global.DB.Updates(&contestant).Error
+}
+
+func DeleteContestant(id uint) error {
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Contestant{}).Error
 }
 
 func GetContestInfo(id uint) (Contest, error) {

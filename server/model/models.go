@@ -50,8 +50,10 @@ func Setup() {
 	sqlDB.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenConns)
 
-	global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{})
-	AddAdmin()
+	if err = global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{}); err != nil {
+		global.LOG.Error(err.Error())
+	}
+	CreateAdmin()
 
 	CasbinSetup()
 }
