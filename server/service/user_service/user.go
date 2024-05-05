@@ -7,9 +7,22 @@ type UserList struct {
 	Total int          `json:"total"`
 }
 
-func (ul *UserList) Get() {
-	ul.Users, _ = model.GetAllUsersList()
+func (ul *UserList) Get() (err error) {
+	ul.Users, err = model.GetAllUsersList()
 	ul.Total = len(ul.Users)
+	return
+}
+
+func (ul *UserList) GetACMers() (err error) {
+	ul.Users, err = model.GetACMersList()
+	ul.Total = len(ul.Users)
+	return
+}
+
+func (ul *UserList) GetTeachers() (err error) {
+	ul.Users, err = model.GetAllTeachersList()
+	ul.Total = len(ul.Users)
+	return
 }
 
 type User struct {
@@ -18,7 +31,7 @@ type User struct {
 
 func (u *User) Add() error {
 	u.User.Role = "acmer"
-	return model.AddUser(u.User)
+	return model.CreateUser(u.User)
 }
 
 func (u *User) Update() error {

@@ -11,7 +11,7 @@ import (
 	"github.com/zilanlann/acmer-manage-system/server/service/user_service"
 )
 
-func AllUserList(c *gin.Context) {
+func GetAllUserList(c *gin.Context) {
 	appG := app.Gin{C: c}
 
 	userList := user_service.UserList{}
@@ -25,7 +25,7 @@ func AllUserList(c *gin.Context) {
 	})
 }
 
-func AddUser(c *gin.Context) {
+func CreateUser(c *gin.Context) {
 	appG := app.Gin{C: c}
 
 	var user user_service.User
@@ -179,4 +179,34 @@ func UpdatePassword(c *gin.Context) {
 	}
 
 	appG.SuccessResponse(http.StatusOK, e.SUCCESS, nil)
+}
+
+func GetAllTeacherList(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	userList := user_service.UserList{}
+	if err := userList.GetTeachers(); err != nil {
+		global.LOG.Error(err.Error())
+		appG.ErrorResponse(http.StatusInternalServerError, e.SERVER_ERROR, nil)
+		return
+	}
+
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"list": userList.Users,
+	})
+}
+
+func GetAllAcmerList(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	userList := user_service.UserList{}
+	if err := userList.GetACMers(); err != nil {
+		global.LOG.Error(err.Error())
+		appG.ErrorResponse(http.StatusInternalServerError, e.SERVER_ERROR, nil)
+		return
+	}
+
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"list": userList.Users,
+	})
 }

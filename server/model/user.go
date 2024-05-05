@@ -4,6 +4,7 @@ import (
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/utils"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type User struct {
@@ -23,13 +24,13 @@ type User struct {
 	Role      string `gorm:"size:30;not null" json:"role"`
 }
 
-func AddUser(user User) error {
+func CreateUser(user User) error {
 	user.Password = utils.BcryptHash(user.Password)
 	return global.DB.Create(&user).Error
 }
 
 func DeleteUser(id uint) error {
-	return global.DB.Where("id = ?", id).Delete(&User{}).Error
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&User{}).Error
 }
 
 func CheckUser(username, password string) (id int, err error) {
@@ -57,7 +58,7 @@ func GetUserInfo(id int) (User, error) {
 }
 
 func UpdateUser(user User) error {
-	return global.DB.Select("username", "real_name", "email", "sex", "student_id", "class", "phone", "cf_handle", "atc_handle").Save(&user).Error
+	return global.DB.Select("username", "real_name", "email", "sex", "student_id", "class", "phone", "cf_handle", "atc_handle").Updates(&user).Error
 }
 
 func UpdateUserRole(id uint, role string) error {
@@ -84,7 +85,13 @@ func GetAllUsersList() ([]User, error) {
 	return users, err
 }
 
-func AddAdmin() error {
+func GetAllTeachersList() ([]User, error) {
+	var users []User
+	err := global.DB.Model(&User{}).Where("role = ?", "teacher").Find(&users).Error
+	return users, err
+}
+
+func CreateAdmin() error {
 	hash := utils.BcryptHash("adminadmin123")
 	return global.DB.Create(&User{Username: "admin", Password: hash, Avatar: "https://userpic.codeforces.org/no-avatar.jpg", Role: "admin"}).Error
 }
