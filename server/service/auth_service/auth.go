@@ -44,5 +44,5 @@ func (a *Auth) Add() error {
 		Role:      "acmer",
 	}
 
-	return model.AddUser(u)
+	return model.CreateUser(u)
 }

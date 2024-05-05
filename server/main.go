@@ -21,12 +21,23 @@ import (
 
 func init() {
 	setting.Setup()
+	global.LOG = zap.Zap() // 初始化zap日志库
 	model.Setup()
 	redis.Setup()
-	global.LOG = zap.Zap() // 初始化zap日志库
+}
+
+func test() {
+	contest := model.Contest{Name: "test", Desc: "test contest", StartTime: time.Now(), EndTime: time.Now(), Teams: []model.Team{{ZhName: "test team", CoachID: 73, Contestants: []model.Contestant{{UserID: 71}, {UserID: 14}, {UserID: 72}}}}}
+	if err := model.CreateContest(&contest); err != nil {
+		global.LOG.Error(err.Error())
+	}
 }
 
 func main() {
+	// test()
+	// contest, _ := model.GetContestInfo(1)
+	// json, _ := json.Marshal(contest)
+	// fmt.Printf("json: %s\n", json)
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
