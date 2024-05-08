@@ -39,12 +39,12 @@ export function useColumns() {
       minWidth: 170,
       sortable: true
     },
-    {
-      label: "Atcoder竞赛分",
-      prop: "atcRating",
-      minWidth: 145,
-      sortable: true
-    },
+    // {
+    //   label: "Atcoder竞赛分",
+    //   prop: "atcRating",
+    //   minWidth: 145,
+    //   sortable: true
+    // },
     {
       label: "周统计",
       children: [
