@@ -30,7 +30,7 @@ func CreateUser(user User) error {
 }
 
 func DeleteUser(id uint) error {
-	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&User{}).Error
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Unscoped().Delete(&User{}).Error
 }
 
 func CheckUser(username, password string) (id int, err error) {

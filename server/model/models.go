@@ -50,7 +50,7 @@ func Setup() {
 	sqlDB.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenConns)
 
-	if err = global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{}); err != nil {
+	if err = global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{}, &OJContest{}); err != nil {
 		global.LOG.Error(err.Error())
 	}
 	CreateAdmin()

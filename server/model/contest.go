@@ -44,7 +44,7 @@ func UpdateContest(contest *Contest) error {
 }
 
 func DeleteContest(id uint) error {
-	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Contest{}).Error
+	return global.DB.Where("id = ?", id).Select(clause.Associations).Delete(&Contest{}).Error
 }
 
 func CreateTeam(team *Team) error {
@@ -56,7 +56,7 @@ func UpdateTeam(team *Team) error {
 }
 
 func DeleteTeam(id uint) error {
-	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Team{}).Error
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Unscoped().Delete(&Team{}).Error
 }
 
 func CreateContestant(contestant *Contestant) error {
@@ -68,7 +68,7 @@ func UpdateContestant(contestant *Contestant) error {
 }
 
 func DeleteContestant(id uint) error {
-	return global.DB.Select(clause.Associations).Where("id = ?", id).Delete(&Contestant{}).Error
+	return global.DB.Select(clause.Associations).Where("id = ?", id).Unscoped().Delete(&Contestant{}).Error
 }
 
 func GetContestInfo(id uint) (Contest, error) {
