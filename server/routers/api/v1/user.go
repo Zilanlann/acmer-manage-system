@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/app"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/e"
@@ -29,15 +30,18 @@ func CreateUser(c *gin.Context) {
 	appG := app.Gin{C: c}
 
 	var user user_service.User
-	if err := c.ShouldBind(&user); err != nil {
+	if err := c.ShouldBindBodyWith(&user, binding.JSON); err != nil {
+		global.LOG.Warn(err.Error())
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
 	}
 	password := struct {
 		Password string `json:"password" form:"password" binding:"required"`
 	}{}
-	if err := c.ShouldBind(&password); err != nil {
+	if err := c.ShouldBindBodyWith(&password, binding.JSON); err != nil {
+		global.LOG.Warn(err.Error())
 		appG.ErrorResponse(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
 	}
 	user.Password = password.Password
 
