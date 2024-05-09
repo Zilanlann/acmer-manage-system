@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+  mysql:
+    container_name: ams-mysql
+    image: mysql:latest
+    restart: "always"
+    environment:
+      MYSQL_ROOT_PASSWORD: "X*TnVEzbKMwHLJ3"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    restart: "always"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  server:
+    image: zilanlann/ams-server:latest
+    restart: "always"
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - 4230:4230
+    volumes:
+      - ./config.toml:/app/conf/config.toml
+    networks:
+      - backend
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  backend:
+    name: ams-backend
