@@ -7,27 +7,48 @@ write_timeout = 15
 [database]
 type = "mysql"
 user = "root"
-password = ""
-host = "127.0.0.1:3306"
+password = "X*TnVEzbKMwHLJ3"
+host = "mysql"
+port = "3306"
 name = "acmer"
 table_prefix = "acmer_"
 max_idle_conns = 10
 max_open_conns = 100
 
+# [database] # postgres
+# type = "postgres"
+# user = "postgres"
+# password = ""
+# host = ""
+# port = ""
+# name = "ams"
+# table_prefix = "acmer_"
+# max_idle_conns = 10
+# max_open_conns = 100
+
 [jwt]
 secret = ""
-long_expires_time = 168          # hours
-short_expires_time = 3           # hours
+long_expires_time = 168        # hours
+short_expires_time = 3         # hours
 issuer = "acmer-manage-system"
 
 [redis]
-host = ""
+host = "redis:6379"
 password = ""
 db = 0
 
 [tencent]
-secret_id = ""
-secret_key = ""
-mail_temp_id = 0
-mail_from = "" # 发件人邮箱地址。不使用别名时请直接填写发件人邮箱地址，例如：noreply@mail.qcloud.com 如需填写发件人别名时，请按照如下方式（注意别名与邮箱地址之间必须使用一个空格隔开）：别名+一个空格+<邮箱地址>
+secret_id = ""        # 腾讯云secret_id
+secret_key = ""       # 腾讯云secret_key
+mail_temp_id = 114514 # 邮件模板ID
+mail_from = ""        # 发件人邮箱地址。不使用别名时请直接填写发件人邮箱地址，例如：noreply@mail.qcloud.com 如需填写发件人别名时，请按照如下方式（注意别名与邮箱地址之间必须使用一个空格隔开）：别名+一个空格+<邮箱地址>
 
+[zap]
+level = "info"
+format = "console"
+prefix = "[AMS]"
+dir = "log"
+show-line = true
+encode-level = "LowercaseColorLevelEncoder"
+stacktrace-key = "stacktrace"
+log-in-console = true
