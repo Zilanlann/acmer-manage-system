@@ -7,10 +7,16 @@ import (
 	"github.com/zilanlann/acmer-manage-system/server/global"
 )
 
-
 func CasbinSetup() {
-	a, _ := gormadapter.NewAdapterByDB(global.DB)
-	global.Casbin, _ = casbin.NewEnforcer("./conf/model.conf", a)
+	var err error
+	a, err := gormadapter.NewAdapterByDB(global.DB)
+	if err != nil {
+		global.LOG.Panic(err.Error())
+	}
+	global.Casbin, err = casbin.NewEnforcer("./conf/model.conf", a)
+	if err != nil {
+		global.LOG.Panic(err.Error())
+	}
 
 	global.Casbin.LoadPolicy()
 }
