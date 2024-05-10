@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/setting"
@@ -27,7 +26,7 @@ func Setup() {
 			Logger: logger.Default.LogMode(logger.Silent),
 		})
 		if err != nil {
-			log.Println(err)
+			global.LOG.Error(err.Error())
 		}
 	case "postgres":
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require TimeZone=Asia/Shanghai", setting.DatabaseSetting.Host, setting.DatabaseSetting.User, setting.DatabaseSetting.Password, setting.DatabaseSetting.Name, setting.DatabaseSetting.Port)
@@ -39,13 +38,13 @@ func Setup() {
 			Logger: logger.Default.LogMode(logger.Silent),
 		})
 		if err != nil {
-			log.Println(err)
+			global.LOG.Error(err.Error())
 		}
 	}
 
 	sqlDB, err := global.DB.DB()
 	if err != nil {
-		log.Println(err)
+		global.LOG.Error(err.Error())
 	}
 	sqlDB.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenConns)

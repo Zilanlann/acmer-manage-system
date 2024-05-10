@@ -29,13 +29,15 @@ services:
     ports:
       - 4230:4230
     volumes:
-      - ./conf/config.toml:/app/conf/config.toml
+      - ./conf/config.toml:/conf/config.toml
+      - server_log:/log
     networks:
       - backend
 
 volumes:
   mysql_data:
   redis_data:
+  server_log:
 
 networks:
   backend:
