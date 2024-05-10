@@ -11,6 +11,11 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:latest
@@ -19,17 +24,25 @@ services:
       - redis_data:/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   server:
     image: zilanlann/ams-server:latest
     restart: "always"
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - 4230:4230
     volumes:
       - ./conf/config.toml:/conf/config.toml
+      - ./conf/model.conf:/conf/model.conf
       - server_log:/log
     networks:
       - backend
