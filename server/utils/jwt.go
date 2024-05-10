@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/setting"
 )
 
@@ -34,14 +34,14 @@ func GenTokens(userID int, username string, role string) (aToken, rToken, exTime
 	// 生成 aToken
 	aToken, err = token.SignedString(jwtSecret)
 	if err != nil {
-		log.Println(err)
+		global.LOG.Error(err.Error())
 	}
 
 	// 生成 rToken
 	claims.StandardClaims.ExpiresAt = time.Now().Add(setting.JwtSetting.LongExpiresTime).Unix()
 	rToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(jwtSecret)
 	if err != nil {
-		log.Println(err)
+		global.LOG.Error(err.Error())
 	}
 	return aToken, rToken, exTime, nil
 }

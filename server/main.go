@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,18 +25,7 @@ func init() {
 	redis.Setup()
 }
 
-func test() {
-	contest := model.Contest{Name: "test", Desc: "test contest", StartTime: time.Now(), EndTime: time.Now(), Teams: []model.Team{{ZhName: "test team", CoachID: 73, Contestants: []model.Contestant{{UserID: 71}, {UserID: 14}, {UserID: 72}}}}}
-	if err := model.CreateContest(&contest); err != nil {
-		global.LOG.Error(err.Error())
-	}
-}
-
 func main() {
-	// test()
-	// contest, _ := model.GetContestInfo(1)
-	// json, _ := json.Marshal(contest)
-	// fmt.Printf("json: %s\n", json)
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
@@ -53,7 +41,7 @@ func main() {
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			log.Printf("Listen: %s\n", err)
+			global.LOG.Error(err.Error())
 		}
 	}()
 
@@ -61,13 +49,13 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	log.Println("Shutdown Server ...")
+	global.LOG.Info("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		global.LOG.Fatal(err.Error())
 	}
 
-	log.Println("Server exiting")
+	global.LOG.Info("Server exiting")
 }

@@ -2,13 +2,13 @@ package cf
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
 	"github.com/zilanlann/acmer-manage-system/server/global"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
 )
+
 func GetWMRating(userHandle string) (weeklyAgo int, monthlyAgo int, err error) {
 	key := fmt.Sprintf("cf:rating:%s:*", userHandle)
 	keys, _, _ := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
@@ -22,7 +22,7 @@ func GetWMRating(userHandle string) (weeklyAgo int, monthlyAgo int, err error) {
 	weeklyAgo = sort.Search(len(ratingChanges), func(i int) bool {
 		return ratingChanges[i].RatingUpdateTimeSeconds <= int(time.Now().AddDate(0, 0, -7).Unix())
 	})
-	if weeklyAgo == len(ratingChanges){
+	if weeklyAgo == len(ratingChanges) {
 		weeklyAgo = 0
 	} else {
 		weeklyAgo = ratingChanges[weeklyAgo].NewRating
@@ -93,7 +93,7 @@ func RefreshUserInfos(userHandles []string) error {
 	}
 	for _, userInfo := range userInfos {
 		if err := setUserInfo(userInfo); err != nil {
-			log.Println(err)
+			global.LOG.Error(err.Error())
 		}
 	}
 	return nil

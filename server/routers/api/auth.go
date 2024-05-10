@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -105,7 +104,7 @@ func Register(c *gin.Context) {
 	}
 	err := authService.Add()
 	if err != nil {
-		log.Println(err)
+		global.LOG.Error(err.Error())
 		appG.ErrorResponse(http.StatusInternalServerError, e.USER_ALREADY_EXIST, nil)
 		return
 	}
