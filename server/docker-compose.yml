@@ -6,6 +6,7 @@ services:
     restart: "always"
     environment:
       MYSQL_ROOT_PASSWORD: "X*TnVEzbKMwHLJ3"
+      MYSQL_DATABASE: "ams"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -28,7 +29,7 @@ services:
     ports:
       - 4230:4230
     volumes:
-      - ./config.toml:/app/conf/config.toml
+      - ./conf/config.toml:/app/conf/config.toml
     networks:
       - backend
 

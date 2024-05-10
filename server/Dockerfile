@@ -21,7 +21,7 @@ FROM scratch
 
 # 从builder阶段复制编译好的程序和conf目录到当前目录
 COPY --from=builder /app/app .
-COPY --from=builder /app/conf ./conf
+COPY --from=builder /app/conf .
 
 # 暴露必要的端口号
 EXPOSE ${PORT}
