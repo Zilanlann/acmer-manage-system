@@ -56,7 +56,7 @@ func GetUserInfos(userHandles []string) (users []User, err error) {
 
 func GetRatingChange(userHandle string) (ratingChange []RatingChange, err error) {
 	key := fmt.Sprintf("cf:rating:%s:*", userHandle)
-	keys, _, _ := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
+	keys, _, err := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
 	for _, key := range keys {
 		tmpRatingChange := RatingChange{}
 		global.REDIS.HGetAll(redis.Ctx, key).Scan(&tmpRatingChange)
@@ -89,6 +89,7 @@ func RefreshUserInfos(userHandles []string) error {
 	}
 	userInfos, err := apiMGetUserInfo(queryUserHandles)
 	if err != nil {
+		global.LOG.Error(err.Error())
 		return err
 	}
 	for _, userInfo := range userInfos {

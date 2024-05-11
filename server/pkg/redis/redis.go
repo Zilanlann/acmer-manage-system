@@ -16,4 +16,12 @@ func Setup() {
 		Password: setting.RedisSetting.Password,
 		DB:       setting.RedisSetting.DB,
 	})
+
+	_, err := global.REDIS.Ping(Ctx).Result()
+	if err != nil {
+		global.LOG.Error(err.Error())
+	} else {
+		global.LOG.Info("Redis Connected!")
+	}
+
 }

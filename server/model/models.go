@@ -52,7 +52,9 @@ func Setup() {
 	if err = global.DB.AutoMigrate(&User{}, &Contest{}, &Team{}, &Contestant{}, &OJContest{}); err != nil {
 		global.LOG.Error(err.Error())
 	}
-	CreateAdmin()
+	if err := CreateAdmin(); err != nil {
+		global.LOG.Error(err.Error())
+	}
 
 	CasbinSetup()
 }

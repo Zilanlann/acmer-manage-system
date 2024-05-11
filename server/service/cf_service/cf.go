@@ -1,6 +1,9 @@
 package cf_service
 
-import "github.com/zilanlann/acmer-manage-system/server/pkg/cf"
+import (
+	"github.com/zilanlann/acmer-manage-system/server/global"
+	"github.com/zilanlann/acmer-manage-system/server/pkg/cf"
+)
 
 type UserStatus struct {
 	UserName      string `json:"userName"`
@@ -15,7 +18,10 @@ type UserStatus struct {
 
 func (u *UserStatus) GetUserStatus() {
 	cf.RefreshRatingChange(u.CFHandle)
-	userInfo, _ := cf.GetUserInfo(u.CFHandle)
+	userInfo, err := cf.GetUserInfo(u.CFHandle)
+	if err != nil {
+		global.LOG.Error(err.Error())
+	}
 	u.CfRating = userInfo.Rating
 	u.WeeklyRating, u.MonthlyRating, _ = cf.GetWMRating(u.CFHandle)
 	u.WeeklyRating = u.CfRating - u.WeeklyRating
@@ -23,7 +29,13 @@ func (u *UserStatus) GetUserStatus() {
 }
 
 func GetAvatar(handle string) string {
-	cf.RefreshUserInfos([]string{handle})
-	user, _ := cf.GetUserInfo(handle)
+	if err := cf.RefreshUserInfos([]string{handle}); err != nil {
+		global.LOG.Error(err.Error())
+	}
+	var user cf.User
+	user, err := cf.GetUserInfo(handle)
+	if err != nil {
+		global.LOG.Error(err.Error())
+	}
 	return user.Avatar
 }

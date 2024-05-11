@@ -55,10 +55,12 @@ type RatingChange struct {
 }
 
 type byTimeDesc []RatingChange
-func (b byTimeDesc) Len() int           { return len(b) }
-func (b byTimeDesc) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
-func (b byTimeDesc) Less(i, j int) bool { return b[i].RatingUpdateTimeSeconds > b[j].RatingUpdateTimeSeconds }
 
+func (b byTimeDesc) Len() int      { return len(b) }
+func (b byTimeDesc) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+func (b byTimeDesc) Less(i, j int) bool {
+	return b[i].RatingUpdateTimeSeconds > b[j].RatingUpdateTimeSeconds
+}
 
 // apiGetUserInfo 通过 Codeforces API 获取用户信息
 func apiGetUserInfo(userHandle string) ([]User, error) {

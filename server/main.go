@@ -19,10 +19,10 @@ import (
 )
 
 func init() {
-	setting.Setup()
+	setting.Setup()        // 初始化配置
 	global.LOG = zap.Zap() // 初始化zap日志库
-	model.Setup()
-	redis.Setup()
+	model.Setup()          // 初始化数据库
+	redis.Setup()          // 初始化redis
 }
 
 func main() {
@@ -54,7 +54,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {
-		global.LOG.Fatal(err.Error())
+		global.LOG.Warn(err.Error())
 	}
 
 	global.LOG.Info("Server exiting")
