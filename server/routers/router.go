@@ -46,6 +46,13 @@ func InitRouter() *gin.Engine {
 		casbin_service.AddRouterPut(apiv1, "/contestant", v1.CreateContestant, "admin", "teacher")
 		casbin_service.AddRouterPut(apiv1, "/contestant/:id", v1.UpdateContestant, "admin", "teacher")
 		casbin_service.AddRouterDelete(apiv1, "/contestant/:id", v1.DeleteContestant, "admin", "teacher")
+
+		// API about favorite site
+		casbin_service.AddRouterPut(apiv1, "/favorite/site-type", v1.CreateSiteType, "admin", "teacher")
+		casbin_service.AddRouterGet(apiv1, "/favorite/site-types", v1.GetSiteTypeList, "admin", "teacher")
+		casbin_service.AddRouterPut(apiv1, "/favorite/site", v1.CreateSite, "admin", "teacher")
+		casbin_service.AddRouterGet(apiv1, "/favorite/sites", v1.GetSiteList, "admin", "teacher")
+		casbin_service.AddRouterDelete(apiv1, "/favorite/site/:id", v1.DeleteSite, "admin", "teacher")
 	}
 	return r
 }
