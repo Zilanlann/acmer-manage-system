@@ -41,7 +41,7 @@ func main() {
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			global.LOG.Error(err.Error())
+			global.LOG.Warn(err.Error())
 		}
 	}()
 

@@ -14,7 +14,7 @@ type Contest struct {
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 	Desc      string    `gorm:"type:text" json:"desc"`
-	Teams     []Team    `json:"teams"`
+	Teams     []Team    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"teams"`
 }
 
 type Team struct {
@@ -23,8 +23,8 @@ type Team struct {
 	ZhName      string       `gorm:"not null;unique" json:"zhName"`
 	EnName      string       `json:"enName"`
 	CoachID     uint         `gorm:"foreignKey:UserID" json:"coachID"`
-	Coach       User         `json:"coach"`
-	Contestants []Contestant `json:"contestants"`
+	Coach       User         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"coach"`
+	Contestants []Contestant `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"contestants"`
 	Desc        string       `gorm:"type:text" json:"desc"`
 }
 
@@ -32,7 +32,7 @@ type Contestant struct {
 	gorm.Model
 	TeamID uint `gorm:"not null" json:"teamID"`
 	UserID uint `gorm:"not null" json:"userID"`
-	User   User `json:"user"`
+	User   User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user"`
 }
 
 func CreateContest(contest *Contest) error {
@@ -44,7 +44,7 @@ func UpdateContest(contest *Contest) error {
 }
 
 func DeleteContest(id uint) error {
-	return global.DB.Where("id = ?", id).Select(clause.Associations).Delete(&Contest{}).Error
+	return global.DB.Where("id = ?", id).Select(clause.Associations).Unscoped().Delete(&Contest{}).Error
 }
 
 func CreateTeam(team *Team) error {
