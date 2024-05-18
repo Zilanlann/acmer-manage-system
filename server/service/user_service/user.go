@@ -31,6 +31,7 @@ type User struct {
 
 func (u *User) Add() error {
 	u.User.Role = "acmer"
+	u.User.Avatar = "https://userpic.codeforces.org/no-avatar.jpg"
 	return model.CreateUser(u.User)
 }
 

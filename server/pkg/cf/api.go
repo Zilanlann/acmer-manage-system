@@ -54,6 +54,73 @@ type RatingChange struct {
 	NewRating               int    `json:"newRating" redis:"newRating"`
 }
 
+type Contest struct {
+	Id                  int     `json:"id"`
+	Name                string  `json:"name"`
+	Type                string  `json:"type"`
+	Phase               string  `json:"phase"`
+	Frozen              bool    `json:"frozen"`
+	DurationSeconds     int     `json:"durationSeconds"`
+	StartTimeSeconds    *int    `json:"startTimeSeconds,omitempty"`
+	RelativeTimeSeconds *int    `json:"relativeTimeSeconds,omitempty"`
+	PreparedBy          *string `json:"preparedBy,omitempty"`
+	WebsiteURL          *string `json:"websiteUrl,omitempty"`
+	Description         *string `json:"description,omitempty"`
+	Difficulty          *int    `json:"difficulty,omitempty"`
+	Kind                *string `json:"kind,omitempty"`
+	ICPCRegion          *string `json:"icpcRegion,omitempty"`
+	Country             *string `json:"country,omitempty"`
+	City                *string `json:"city,omitempty"`
+	Season              *string `json:"season,omitempty"`
+}
+
+// Problem represents a problem.
+type Problem struct {
+	ContestId      *int     `json:"contestId,omitempty"`
+	ProblemsetName *string  `json:"problemsetName,omitempty"`
+	Index          string   `json:"index"`
+	Name           string   `json:"name"`
+	Type           string   `json:"type"` // PROGRAMMING or QUESTION
+	Points         *float64 `json:"points,omitempty"`
+	Rating         *int     `json:"rating,omitempty"`
+	Tags           []string `json:"tags"`
+}
+
+// Party represents a party, participating in a contest.
+type Party struct {
+	ContestId        *int     `json:"contestId,omitempty"`
+	Members          []Member `json:"members"`
+	ParticipantType  string   `json:"participantType"` // CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION
+	TeamId           *int     `json:"teamId,omitempty"`
+	TeamName         *string  `json:"teamName,omitempty"`
+	Ghost            bool     `json:"ghost"`
+	Room             *int     `json:"room,omitempty"`
+	StartTimeSeconds *int64   `json:"startTimeSeconds,omitempty"`
+}
+
+// Member represents a member of a party.
+type Member struct {
+	Handle string  `json:"handle"`
+	Name   *string `json:"name,omitempty"`
+}
+
+// Submission represents a submission.
+type Submission struct {
+	Id                  int      `json:"id"`
+	ContestId           *int     `json:"contestId,omitempty"`
+	CreationTimeSeconds int64    `json:"creationTimeSeconds"`
+	RelativeTimeSeconds int64    `json:"relativeTimeSeconds"`
+	Problem             Problem  `json:"problem"`
+	Author              Party    `json:"author"`
+	ProgrammingLanguage string   `json:"programmingLanguage"`
+	Verdict             *string  `json:"verdict,omitempty"` // FAILED, OK, PARTIAL, COMPILATION_ERROR, etc.
+	Testset             string   `json:"testset"`           // SAMPLES, PRETESTS, TESTS, CHALLENGES, etc.
+	PassedTestCount     int      `json:"passedTestCount"`
+	TimeConsumedMillis  int      `json:"timeConsumedMillis"`
+	MemoryConsumedBytes int64    `json:"memoryConsumedBytes"`
+	Points              *float64 `json:"points,omitempty"`
+}
+
 type byTimeDesc []RatingChange
 
 func (b byTimeDesc) Len() int      { return len(b) }
@@ -151,4 +218,64 @@ func apiGetUserRating(userHandle string) ([]RatingChange, error) {
 	}
 
 	return userRating.Result, nil
+}
+
+// apiGetContests 通过 Codeforces API 获取竞赛列表
+func apiGetContests() ([]Contest, error) {
+	url := "https://codeforces.com/api/contest.list?gym=false"
+
+	// 发送 HTTP GET 请求
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("request error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应体
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body error: %v", err)
+	}
+
+	// 解析 JSON
+	var contests struct {
+		Status string    `json:"status"`
+		Result []Contest `json:"result"`
+	}
+	err = json.Unmarshal(body, &contests)
+	if err != nil {
+		return nil, fmt.Errorf("json unmarshal error: %v", err)
+	}
+
+	return contests.Result, nil
+}
+
+// apiGetUserSubmissions 通过 Codeforces API 获取用户的提交记录
+func apiGetUserSubmissions(userHandle string) ([]Submission, error) {
+	url := fmt.Sprintf("https://codeforces.com/api/user.status?handle=%s", userHandle)
+
+	// 发送 HTTP GET 请求
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("request error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应体
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body error: %v", err)
+	}
+
+	// 解析 JSON
+	var submissions struct {
+		Status string       `json:"status"`
+		Result []Submission `json:"result"`
+	}
+	err = json.Unmarshal(body, &submissions)
+	if err != nil {
+		return nil, fmt.Errorf("json unmarshal error: %v", err)
+	}
+
+	return submissions.Result, nil
 }

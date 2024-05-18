@@ -47,11 +47,16 @@ func InitRouter() *gin.Engine {
 		casbin_service.AddRouterPut(apiv1, "/contestant/:id", v1.UpdateContestant, "admin", "teacher")
 		casbin_service.AddRouterDelete(apiv1, "/contestant/:id", v1.DeleteContestant, "admin", "teacher")
 
+		// API about OJ
+		casbin_service.AddRouterGet(apiv1, "/oj/contests", v1.AllOJContestList, "admin", "teacher", "acmer")
+		casbin_service.AddRouterGet(apiv1, "/oj/submissions/user/:id", v1.GetUserSubmissionsList, "admin", "teacher", "acmer")
+		casbin_service.AddRouterGet(apiv1, "/oj/submissions/tags", v1.GetAllTagList, "admin", "teacher", "acmer")
+
 		// API about favorite site
 		casbin_service.AddRouterPut(apiv1, "/favorite/site-type", v1.CreateSiteType, "admin", "teacher")
-		casbin_service.AddRouterGet(apiv1, "/favorite/site-types", v1.GetSiteTypeList, "admin", "teacher")
+		casbin_service.AddRouterGet(apiv1, "/favorite/site-types", v1.GetSiteTypeList, "admin", "teacher", "acmer")
 		casbin_service.AddRouterPut(apiv1, "/favorite/site", v1.CreateSite, "admin", "teacher")
-		casbin_service.AddRouterGet(apiv1, "/favorite/sites", v1.GetSiteList, "admin", "teacher")
+		casbin_service.AddRouterGet(apiv1, "/favorite/sites", v1.GetSiteList, "admin", "teacher", "acmer")
 		casbin_service.AddRouterDelete(apiv1, "/favorite/site/:id", v1.DeleteSite, "admin", "teacher")
 	}
 	return r

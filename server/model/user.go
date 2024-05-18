@@ -9,19 +9,20 @@ import (
 
 type User struct {
 	gorm.Model
-	Username  string `gorm:"size:255;not null;unique" json:"username" binding:"required"`
-	RealName  string `gorm:"size:30" json:"realname" binding:"required"`
-	Email     string `gorm:"size:255;not null;unique" json:"email" binding:"required"`
-	Sex       bool   `json:"sex"`
-	StudentID string `gorm:"size:30" json:"studentID"`
-	Class     string `gorm:"size:30" json:"class"`
-	Phone     string `gorm:"size:30" json:"phone"`
-	CFHandle  string `gorm:"size:255" json:"cfHandle"`
-	ATCHandle string `gorm:"size:255" json:"atcHandle"`
-	Avatar    string `gorm:"size:255" json:"avatar"`
-	Desc      string `gorm:"type:text" json:"desc"`
-	Password  string `gorm:"size:255;not null" json:"-"`
-	Role      string `gorm:"size:30;not null" json:"role"`
+	Username      string         `gorm:"size:255;not null;unique" json:"username" binding:"required"`
+	RealName      string         `gorm:"size:30" json:"realname" binding:"required"`
+	Email         string         `gorm:"size:255;not null;unique" json:"email" binding:"required"`
+	Sex           bool           `json:"sex"`
+	StudentID     string         `gorm:"size:30" json:"studentID"`
+	Class         string         `gorm:"size:30" json:"class"`
+	Phone         string         `gorm:"size:30" json:"phone"`
+	CFHandle      string         `gorm:"size:255" json:"cfHandle"`
+	ATCHandle     string         `gorm:"size:255" json:"atcHandle"`
+	Avatar        string         `gorm:"size:255" json:"avatar"`
+	Desc          string         `gorm:"type:text" json:"desc"`
+	Password      string         `gorm:"size:255;not null" json:"-"`
+	Role          string         `gorm:"size:30;not null" json:"role"`
+	OJSubmissions []OJSubmission `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 func CreateUser(user User) error {
@@ -94,4 +95,16 @@ func GetAllTeachersList() ([]User, error) {
 func CreateAdmin() error {
 	hash := utils.BcryptHash("adminadmin123")
 	return global.DB.Create(&User{Username: "admin", Password: hash, Avatar: "https://userpic.codeforces.org/no-avatar.jpg", Role: "admin"}).Error
+}
+
+func GetUserByCfHandle(cfHandle string) (User, error) {
+	var user User
+	err := global.DB.Where("cf_handle = ?", cfHandle).First(&user).Error
+	return user, err
+}
+
+func GetUserIdByCfHandle(cfHandle string) (uint, error) {
+	var user User
+	err := global.DB.Where("cf_handle = ?", cfHandle).First(&user).Error
+	return user.ID, err
 }

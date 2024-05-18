@@ -14,6 +14,7 @@ import (
 	"github.com/zilanlann/acmer-manage-system/server/pkg/redis"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/zap"
 	"github.com/zilanlann/acmer-manage-system/server/routers"
+	"github.com/zilanlann/acmer-manage-system/server/schedule"
 	"github.com/zilanlann/acmer-manage-system/server/setting"
 	_ "go.uber.org/automaxprocs"
 )
@@ -26,8 +27,12 @@ func init() {
 }
 
 func main() {
-	gin.SetMode(setting.ServerSetting.RunMode)
+	// 启动定时任务调度器
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go schedule.StartScheduler(ctx)
 
+	gin.SetMode(setting.ServerSetting.RunMode)
 	routersInit := routers.InitRouter()
 	endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
 
@@ -51,9 +56,9 @@ func main() {
 
 	global.LOG.Info("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.Shutdown(ctx); err != nil {
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel2()
+	if err := s.Shutdown(ctx2); err != nil {
 		global.LOG.Warn(err.Error())
 	}
 
