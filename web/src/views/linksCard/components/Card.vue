@@ -91,7 +91,8 @@ const getFaviconUrl = (host: string) => {
       width: 46px;
       height: 46px;
       font-size: 26px;
-      background: #e0ebff;
+      // Removed the background property
+      // background: #e0ebff;
       border-radius: 50%;
 
       img {

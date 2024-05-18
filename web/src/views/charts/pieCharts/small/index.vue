@@ -13,8 +13,8 @@ import {
   TooltipComponent,
   LegendComponent
 } from "echarts/components";
-import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide } from "vue";
+import VChart from "vue-echarts";
+import { ref, watch, defineProps } from "vue";
 
 defineOptions({
   name: "PieChartSmall"
@@ -28,35 +28,39 @@ use([
   LegendComponent
 ]);
 
-// provide(THEME_KEY, "dark");
-
-const option = ref({
-  tooltip: {
-    trigger: "item",
-    formatter: "{b} : {c} ({d}%)",
-    confine: true
-  },
-  series: [
-    {
-      name: "Skills",
-      type: "pie",
-      radius: "55%",
-      center: ["50%", "60%"],
-      data: [
-        { value: 335, name: "brute force" },
-        { value: 310, name: "data structures" },
-        { value: 234, name: "dp" },
-        { value: 135, name: "math" },
-        { value: 1548, name: "number theory" }
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: "rgba(0, 0, 0, 0.5)"
-        }
-      }
-    }
-  ]
+const props = defineProps({
+  userData: Array
 });
+
+const option = ref({});
+
+watch(
+  () => props.userData,
+  newData => {
+    option.value = {
+      tooltip: {
+        trigger: "item",
+        formatter: "{b} : {c} ({d}%)",
+        confine: true
+      },
+      series: [
+        {
+          name: "Skills",
+          type: "pie",
+          radius: "55%",
+          center: ["50%", "60%"],
+          data: newData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)"
+            }
+          }
+        }
+      ]
+    };
+  },
+  { immediate: true }
+);
 </script>

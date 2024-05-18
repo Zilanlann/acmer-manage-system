@@ -139,13 +139,129 @@ export function useColumns() {
     pagination.align = paginationAlign.value as Align;
   });
 
+  // onMounted(async () => {
+  //   const newList = [];
+  //   await getTableData();
+  //   newList.push(clone(useDataStoreHook().status, true));
+  //   newList.flat(Infinity).forEach((item, index) => {
+  //     dataList.value.push({ id: index, ...item });
+  //   });
+  //   pagination.total = dataList.value.length;
+  //   loading.value = false;
+  // });
+
   onMounted(async () => {
-    const newList = [];
-    await getTableData();
-    newList.push(clone(useDataStoreHook().status, true));
-    newList.flat(Infinity).forEach((item, index) => {
-      dataList.value.push({ id: index, ...item });
-    });
+    // 模拟写死的用户数据
+    const newList = [
+      {
+        id: 1,
+        realName: "韩逸凡",
+        cfRating: 1483,
+        weeklyRating: 12,
+        weeklyActive: 128,
+        monthlyRating: 40,
+        monthlyActive: 612,
+        pieData: [
+          { value: 129, name: "brute force" },
+          { value: 107, name: "data structures" },
+          { value: 234, name: "dp" },
+          { value: 280, name: "math" },
+          { value: 58, name: "number theory" },
+          { value: 82, name: "sortings" },
+          { value: 186, name: "constructive algorithms" }
+        ]
+      },
+      {
+        id: 2,
+        realName: "戴赟",
+        cfRating: 1687,
+        weeklyRating: 20,
+        weeklyActive: 120,
+        monthlyRating: 50,
+        monthlyActive: 450,
+        pieData: [
+          { value: 322, name: "brute force" },
+          { value: 123, name: "data structures" },
+          { value: 312, name: "dp" },
+          { value: 235, name: "math" },
+          { value: 432, name: "sortings" },
+          { value: 123, name: "constructive algorithms" }
+        ]
+      },
+      {
+        id: 3,
+        realName: "张涛",
+        cfRating: 1423,
+        weeklyRating: 8,
+        weeklyActive: 33,
+        monthlyRating: 36,
+        monthlyActive: 122,
+        pieData: [
+          { value: 491, name: "brute force" },
+          { value: 410, name: "data structures" },
+          { value: 134, name: "dp" },
+          { value: 235, name: "math" },
+          { value: 124, name: "sortings" },
+          { value: 123, name: "constructive algorithms" },
+          { value: 142, name: "number theory" }
+        ]
+      },
+      {
+        id: 4,
+        realName: "尹星星",
+        cfRating: 1387,
+        weeklyRating: 20,
+        weeklyActive: 211,
+        monthlyRating: 50,
+        monthlyActive: 763,
+        pieData: [
+          { value: 111, name: "brute force" },
+          { value: 311, name: "data structures" },
+          { value: 211, name: "dp" },
+          { value: 33, name: "math" },
+          { value: 121, name: "sortings" },
+          { value: 333, name: "constructive algorithms" },
+          { value: 231, name: "number theory" }
+        ]
+      },
+      {
+        id: 5,
+        realName: "刘雨凡",
+        cfRating: 1289,
+        weeklyRating: 0,
+        weeklyActive: 80,
+        monthlyRating: 39,
+        monthlyActive: 322,
+        pieData: [
+          { value: 421, name: "brute force" },
+          { value: 311, name: "data structures" },
+          { value: 211, name: "dp" },
+          { value: 33, name: "math" },
+          { value: 121, name: "sortings" },
+          { value: 333, name: "constructive algorithms" },
+          { value: 231, name: "number theory" }
+        ]
+      },
+      {
+        id: 6,
+        realName: "黄子豪",
+        cfRating: 1354,
+        weeklyRating: 9,
+        weeklyActive: 60,
+        monthlyRating: 77,
+        monthlyActive: 220,
+        pieData: [
+          { value: 111, name: "brute force" },
+          { value: 311, name: "data structures" },
+          { value: 211, name: "dp" },
+          { value: 33, name: "math" },
+          { value: 121, name: "sortings" },
+          { value: 501, name: "constructive algorithms" },
+          { value: 80, name: "number theory" }
+        ]
+      }
+    ];
+    dataList.value = newList;
     pagination.total = dataList.value.length;
     loading.value = false;
   });

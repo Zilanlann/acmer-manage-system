@@ -174,6 +174,14 @@ export function useProblem(tableRef: Ref, treeRef: Ref) {
       });
     }
 
+    // 筛选Tag
+    if (body?.tags && body.tags.length > 0) {
+      allData.value = allData.value.filter(item => {
+        const itemTagIds = item.tags.map(tag => tag.ID);
+        return body.tags.every(tagId => itemTagIds.includes(tagId));
+      });
+    }
+
     updatePaginationData(); // 更新分页数据
     loading.value = false;
   }

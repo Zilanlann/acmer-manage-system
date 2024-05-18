@@ -38,14 +38,8 @@ onUnmounted(() => {
 <template>
   <div style="width: 100%; height: 100%">
     <el-space class="float-right mb-4">
-      <!-- <p class="text-sm">多选：</p>
-      <el-radio-group v-model="select" size="small">
-        <el-radio-button value="yes">是</el-radio-button>
-        <el-radio-button value="no">否</el-radio-button>
-      </el-radio-group> -->
       <p class="text-sm">是否隐藏饼图：</p>
       <el-switch v-model="hidePie" />
-      <!-- <el-divider direction="vertical" /> -->
     </el-space>
 
     <pure-table
@@ -70,8 +64,8 @@ onUnmounted(() => {
       :pagination="pagination"
       @page-current-change="onCurrentChange"
     >
-      <template #echart="{ index }">
-        <smallPie />
+      <template #echart="{ row }">
+        <smallPie :user-data="row.pieData" />
       </template>
     </pure-table>
   </div>
