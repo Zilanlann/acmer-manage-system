@@ -16,6 +16,8 @@ export interface DataInfo<T> {
   roles?: Array<string>;
   /** 头像 */
   avatar?: string;
+  /** 用户Id */
+  id?: number;
 }
 
 export const userKey = "user-info";
@@ -74,22 +76,30 @@ export function setToken(data: DataInfo<Date>) {
       : {}
   );
 
-  function setUserKey(username: string, roles: Array<string>, avatar: string) {
+  function setUserKey(
+    username: string,
+    roles: Array<string>,
+    avatar: string,
+    id: number
+  ) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
     useUserStoreHook().SET_AVATAR(avatar);
+    useUserStoreHook().SET_ID(id);
     storageLocal().setItem(userKey, {
       refreshToken,
       expires,
       username,
       roles,
-      avatar
+      avatar,
+      id
     });
   }
+  console.log(data);
 
-  if (data.username && data.roles && data.avatar) {
-    const { username, roles, avatar } = data;
-    setUserKey(username, roles, avatar);
+  if (data.username && data.roles && data.avatar && data.id) {
+    const { username, roles, avatar, id } = data;
+    setUserKey(username, roles, avatar, id);
   } else {
     const username =
       storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
@@ -97,7 +107,8 @@ export function setToken(data: DataInfo<Date>) {
       storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
     const avatar =
       storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
-    setUserKey(username, roles, avatar);
+    const id = storageLocal().getItem<DataInfo<number>>(userKey)?.id ?? 0;
+    setUserKey(username, roles, avatar, id);
   }
 }
 

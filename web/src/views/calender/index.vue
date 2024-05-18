@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { onMounted, reactive, ref } from "vue";
+import type { CalendarDateType, CalendarInstance } from "element-plus";
+import { getAllOJContestList } from "@/api/oj";
+
 defineOptions({
   name: "Calendar"
 });
-import { reactive, ref } from "vue";
-import type { CalendarDateType, CalendarInstance } from "element-plus";
 
 const calendar = ref<CalendarInstance>();
 const selectDate = (val: CalendarDateType) => {
@@ -11,28 +13,50 @@ const selectDate = (val: CalendarDateType) => {
   calendar.value.selectDate(val);
 };
 
-const contests = reactive([
-  {
-    name: "Codeforces Round (Div. 4)",
-    oj: "codeforces",
-    link: "https://codeforces.com/",
-    date: "2024-04-23"
-  },
-  {
-    name: "Codeforces Round (Div. 3)",
-    link: "https://codeforces.com/",
-    date: "2024-04-23"
-  },
-  {
-    name: "Codeforces Round (Div. 3)",
-    link: "https://codeforces.com/",
-    date: "2024-04-23"
-  }
-]);
+const contests = reactive<
+  Array<{ name: string; oj?: string; link: string; date: string }>
+>([]);
 
 const openUrl = (url: string) => {
   window.open(url, "_blank");
 };
+
+const getOJLink = (oj: string, contestID: number) => {
+  switch (oj.toLowerCase()) {
+    case "codeforces":
+      return `https://codeforces.com/contest/${contestID}`;
+    case "leetcode":
+      return `https://leetcode.com/contest/${contestID}`;
+    case "atcoder":
+      return `https://atcoder.jp/contests/${contestID}`;
+    // Add more OJs as needed
+    default:
+      return "#"; // Default link if OJ is not recognized
+  }
+};
+
+const transformData = (data: Array<any>) => {
+  return data.map(item => ({
+    name: item.name,
+    oj: item.oj,
+    link: getOJLink(item.oj, item.contestID), // Set the link based on the OJ and contestID
+    date: item.startTime.split("T")[0] // Extracting the date part from the startTime
+  }));
+};
+
+onMounted(async () => {
+  try {
+    const response = await getAllOJContestList();
+    if (response.success && response.data?.list) {
+      const transformedData = transformData(response.data.list);
+      contests.push(...transformedData);
+    } else {
+      console.error("Failed to fetch contest data:", response);
+    }
+  } catch (error) {
+    console.error("Error fetching contest data:", error);
+  }
+});
 </script>
 
 <template>
@@ -41,13 +65,13 @@ const openUrl = (url: string) => {
       <span>{{ date }}</span>
       <b><span>各大OJ竞赛日历</span></b>
       <el-button-group>
-        <el-button size="small" @click="selectDate('prev-month')">
-          Previous Month
-        </el-button>
-        <el-button size="small" @click="selectDate('today')">Today</el-button>
-        <el-button size="small" @click="selectDate('next-month')">
-          Next Month
-        </el-button>
+        <el-button size="small" @click="selectDate('prev-month')"
+          >上个月</el-button
+        >
+        <el-button size="small" @click="selectDate('today')">今天</el-button>
+        <el-button size="small" @click="selectDate('next-month')"
+          >下个月</el-button
+        >
       </el-button-group>
     </template>
     <template #date-cell="{ data }">
@@ -57,9 +81,9 @@ const openUrl = (url: string) => {
           v-for="contest in contests.filter(item => item.date === data.day)"
           :key="contest.name"
         >
-          <span class="contest-tag" @click="openUrl(contest.link)">
-            {{ contest.name }}
-          </span>
+          <span class="contest-tag" @click="openUrl(contest.link)">{{
+            contest.name
+          }}</span>
           <a :href="contest.link"> </a>
         </div>
       </div>
