@@ -65,7 +65,7 @@ onUnmounted(() => {
       @page-current-change="onCurrentChange"
     >
       <template #echart="{ row }">
-        <smallPie :user-data="row.pieData" />
+        <smallPie :user-data="row.tag_count_list" />
       </template>
     </pure-table>
   </div>
