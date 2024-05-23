@@ -119,9 +119,54 @@ func GetAllTags() (tags []ProblemTag, err error) {
 	return
 }
 
+// Function to calculate the count of submissions for each tag by a single user
+func GetTagCountsByUser(userID uint) (map[string]int, error) {
+	var submissions []OJSubmission
+	err := global.DB.Preload("Tags").Where("user_id = ?", userID).Find(&submissions).Error
+	if err != nil {
+		return nil, err
+	}
+
+	tagCounts := make(map[string]int)
+	for _, submission := range submissions {
+		for _, tag := range submission.Tags {
+			tagCounts[tag.Name]++
+		}
+	}
+
+	return tagCounts, nil
+}
+
+func CalcUserActiveByUser(userID uint) (monthlyActive, weeklyActive int, err error) {
+	var submission []OJSubmission
+
+	err = global.DB.Where("user_id = ?", userID).Find(&submission).Error
+	if err != nil {
+		return
+	}
+
+	for _, s := range submission {
+		if s.Time.After(time.Now().AddDate(0, -1, 0)) {
+			if s.Verdict == "OK" {
+				monthlyActive += s.Rating
+			} else {
+				monthlyActive += 10
+			}
+		}
+		if s.Time.After(time.Now().AddDate(0, -7, 0)) {
+			if s.Verdict == "OK" {
+				weeklyActive += s.Rating
+			} else {
+				weeklyActive += 10
+			}
+		}
+	}
+	return
+}
+
 type UserStatus struct {
 	gorm.Model
-	UserID          uint `json:"userID"`
+	UserID          uint `json:"-" gorm:"constraint:OnDelete:CASCADE;"`
 	CFRating        int  `json:"cfRating"`
 	CFWeeklyRating  int  `json:"weeklyRating"`
 	CFMonthlyRating int  `json:"monthlyRating"`
@@ -137,10 +182,45 @@ func (status *UserStatus) Update() error {
 	return global.DB.Save(&status).Error
 }
 
+func (status *UserStatus) UpdateByCFHandle(cfHandle string) error {
+	userId, err := GetUserIdByCfHandle(cfHandle)
+	if err != nil {
+		return err
+	}
+	// check if status exists
+	var userStatus UserStatus
+	err = global.DB.Where("user_id = ?", userId).First(&userStatus).Error
+	if err == gorm.ErrRecordNotFound {
+		// If not found, create a new record with initial values
+		userStatus.UserID = userId
+		userStatus.CFRating = status.CFRating
+		userStatus.CFWeeklyRating = status.CFWeeklyRating
+		userStatus.CFMonthlyRating = status.CFMonthlyRating
+		userStatus.WeeklyActive = status.WeeklyActive
+		userStatus.MonthlyActive = status.MonthlyActive
+		return global.DB.Create(&userStatus).Error
+	} else if err != nil {
+		return err
+	}
+
+	// Update existing record with new values
+	userStatus.CFRating = status.CFRating
+	userStatus.CFWeeklyRating = status.CFWeeklyRating
+	userStatus.CFMonthlyRating = status.CFMonthlyRating
+	userStatus.WeeklyActive = status.WeeklyActive
+	userStatus.MonthlyActive = status.MonthlyActive
+	return global.DB.Save(&userStatus).Error
+}
+
 func (status *UserStatus) GetByUserID(userID uint) error {
 	return global.DB.First(&status, userID).Error
 }
 
 func (status *UserStatus) Delete() error {
 	return global.DB.Unscoped().Delete(&status).Error
+}
+
+func GetAllUserStatusList() (statusList []UserStatus, err error) {
+	err = global.DB.Find(&statusList).Error
+	return
 }

@@ -11,35 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetWMRating(userHandle string) (weeklyAgo int, monthlyAgo int, err error) {
-	key := fmt.Sprintf("cf:rating:%s:*", userHandle)
-	keys, _, _ := global.REDIS.Scan(redis.Ctx, 0, key, 1000).Result()
-	ratingChanges := make([]RatingChange, 0, len(keys))
-	for _, key := range keys {
-		ratingChange := RatingChange{}
-		global.REDIS.HGetAll(redis.Ctx, key).Scan(&ratingChange)
-		ratingChanges = append(ratingChanges, ratingChange)
-	}
-	sort.Sort(byTimeDesc(ratingChanges))
-	weeklyAgo = sort.Search(len(ratingChanges), func(i int) bool {
-		return ratingChanges[i].RatingUpdateTimeSeconds <= int(time.Now().AddDate(0, 0, -7).Unix())
-	})
-	if weeklyAgo == len(ratingChanges) {
-		weeklyAgo = 0
-	} else {
-		weeklyAgo = ratingChanges[weeklyAgo].NewRating
-	}
-	monthlyAgo = sort.Search(len(ratingChanges), func(i int) bool {
-		return ratingChanges[i].RatingUpdateTimeSeconds <= int(time.Now().AddDate(0, -1, 0).Unix())
-	})
-	if monthlyAgo == len(ratingChanges) {
-		monthlyAgo = 0
-	} else {
-		monthlyAgo = ratingChanges[monthlyAgo].NewRating
-	}
-	return
-}
-
 func GetUserInfo(userHandle string) (user User, err error) {
 	key := fmt.Sprintf("cf:user:%s", userHandle)
 	err = global.REDIS.HGetAll(redis.Ctx, key).Scan(&user)
@@ -75,6 +46,34 @@ func RefreshRatingChange(userHandle string) error {
 	for _, ratingChange := range ratingChanges {
 		key := fmt.Sprintf("cf:rating:%s:%d", userHandle, ratingChange.ContestId)
 		global.REDIS.HSet(redis.Ctx, key, ratingChange)
+	}
+	return nil
+}
+
+// RefreshCFRating refresh users' codeforces rating and save it in database
+func RefreshCFRating(userHandles []string) error {
+	userInfos, err := apiMGetUserInfo(userHandles)
+	if err != nil {
+		return err
+	}
+	users := make([]model.UserStatus, len(userInfos))
+	for i, userInfo := range userInfos {
+		users[i].CFRating = userInfo.Rating
+	}
+	for i, userHandle := range userHandles {
+		ratingChanges, err := apiGetUserRating(userHandle)
+		if err != nil {
+			return err
+		}
+		monthlyChange, weeklyChange := calcRatingChanges(ratingChanges)
+		users[i].CFMonthlyRating = monthlyChange
+		users[i].CFWeeklyRating = weeklyChange
+	}
+	for i, user := range users {
+		err = user.UpdateByCFHandle(userHandles[i])
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -257,4 +256,28 @@ func RefreshAllUserSubmisions() error {
 	}
 
 	return nil
+}
+
+func calcRatingChanges(ratingChanges []RatingChange) (monthlyChange, weeklyChange int) {
+	sort.Sort(byTimeDesc(ratingChanges))
+	currentRating := ratingChanges[0].NewRating
+	weeklyChange = sort.Search(len(ratingChanges), func(i int) bool {
+		return ratingChanges[i].RatingUpdateTimeSeconds <= int(time.Now().AddDate(0, 0, -7).Unix())
+	})
+	if weeklyChange == len(ratingChanges) {
+		weeklyChange = 0
+	} else {
+		weeklyChange = ratingChanges[weeklyChange].NewRating
+	}
+	monthlyChange = sort.Search(len(ratingChanges), func(i int) bool {
+		return ratingChanges[i].RatingUpdateTimeSeconds <= int(time.Now().AddDate(0, -1, 0).Unix())
+	})
+	if monthlyChange == len(ratingChanges) {
+		monthlyChange = 0
+	} else {
+		monthlyChange = ratingChanges[monthlyChange].NewRating
+	}
+	weeklyChange = currentRating - weeklyChange
+	monthlyChange = currentRating - monthlyChange
+	return
 }

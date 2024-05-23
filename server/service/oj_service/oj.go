@@ -59,6 +59,16 @@ func (o *OJSubmissionList) GetByUser(userId uint) error {
 	return nil
 }
 
+func (o *OJSubmissionList) GetByUserAndTime(userId uint, lTime, rTime time.Time) error {
+	submissions, err := model.GetUserSubmissionByTime(userId, lTime, rTime)
+	if err != nil {
+		return err
+	}
+	o.Submissions = submissions
+	o.Total = len(submissions)
+	return nil
+}
+
 type ProblemTagList struct {
 	Tags  []model.ProblemTag `json:"list"`
 	Total int                `json:"total"`

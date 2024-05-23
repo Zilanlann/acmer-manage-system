@@ -24,7 +24,7 @@ func InitRouter() *gin.Engine {
 	apiv1.Use(middleware.JWTAuth(), middleware.CheckPermission())
 	{
 		// API about user
-		casbin_service.AddRouterGet(apiv1, "/all-user-status", v1.AllUserStatus, "admin", "teacher", "acmer")
+		casbin_service.AddRouterGet(apiv1, "/users/status", v1.GetAllUserStatusList, "admin", "teacher", "acmer")
 		casbin_service.AddRouterGet(apiv1, "/users", v1.GetAllUserList, "admin", "teacher")
 		casbin_service.AddRouterGet(apiv1, "/teachers", v1.GetAllTeacherList, "admin", "teacher")
 		casbin_service.AddRouterGet(apiv1, "/acmers", v1.GetAllAcmerList, "admin", "teacher")

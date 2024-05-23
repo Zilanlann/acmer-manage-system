@@ -214,3 +214,19 @@ func GetAllAcmerList(c *gin.Context) {
 		"list": userList.Users,
 	})
 }
+
+func GetAllUserStatusList(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	userStatusList := user_service.UserStatusList{}
+	if err := userStatusList.Get(); err != nil {
+		global.LOG.Error(err.Error())
+		appG.ErrorResponse(http.StatusInternalServerError, e.SERVER_ERROR, nil)
+		return
+	}
+
+	appG.SuccessResponse(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"list":  userStatusList.List,
+		"total": userStatusList.Total,
+	})
+}

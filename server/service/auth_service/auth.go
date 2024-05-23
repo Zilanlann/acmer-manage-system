@@ -5,7 +5,7 @@ import (
 )
 
 type Auth struct {
-	UserId    int
+	UserId    uint
 	Username  string
 	Password  string
 	Realname  string

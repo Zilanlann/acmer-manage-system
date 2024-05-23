@@ -59,7 +59,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	aToken, rToken, exTime, err := utils.GenTokens(authService.UserId, authService.Username, authService.Role)
+	aToken, rToken, exTime, err := utils.GenTokens(int(authService.UserId), authService.Username, authService.Role)
 	if err != nil {
 		global.LOG.Error(err.Error())
 		appG.ErrorResponse(http.StatusInternalServerError, e.ERROR_GEN_TOKEN, nil)

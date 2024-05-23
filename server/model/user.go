@@ -34,7 +34,7 @@ func DeleteUser(id uint) error {
 	return global.DB.Select(clause.Associations).Where("id = ?", id).Unscoped().Delete(&User{}).Error
 }
 
-func CheckUser(username, password string) (id int, err error) {
+func CheckUser(username, password string) (id uint, err error) {
 	if username == "" || password == "" {
 		return 0, nil
 	}
@@ -47,12 +47,12 @@ func CheckUser(username, password string) (id int, err error) {
 		return 0, err // 数据库错误
 	}
 	if utils.BcryptCheck(password, user.Password) {
-		return int(user.ID), nil // 用户存在，密码正确
+		return user.ID, nil // 用户存在，密码正确
 	}
 	return 0, nil
 }
 
-func GetUserInfo(id int) (User, error) {
+func GetUserInfo(id uint) (User, error) {
 	var user User
 	err := global.DB.Where("id = ?", id).First(&user).Error
 	return user, err

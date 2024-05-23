@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zilanlann/acmer-manage-system/server/global"
+	"github.com/zilanlann/acmer-manage-system/server/model"
 	"github.com/zilanlann/acmer-manage-system/server/pkg/cf"
 )
 
@@ -29,6 +30,14 @@ func scheduleTask() {
 		global.LOG.Error(err.Error())
 	}
 	if err := cf.RefreshAllUserSubmisions(); err != nil {
+		global.LOG.Error(err.Error())
+	}
+	acmers, _ := model.GetACMersList()
+	cfHandles := make([]string, 0, len(acmers))
+	for _, acmer := range acmers {
+		cfHandles = append(cfHandles, acmer.CFHandle)
+	}
+	if err := cf.RefreshCFRating(cfHandles); err != nil {
 		global.LOG.Error(err.Error())
 	}
 }
