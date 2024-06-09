@@ -10,8 +10,8 @@ user = "root"
 password = "X*TnVEzbKMwHLJ3"
 host = "mysql"
 port = "3306"
-name = "acmer"
-table_prefix = "acmer_"
+name = "ams"
+table_prefix = "ams_"
 max_idle_conns = 10
 max_open_conns = 100
 
